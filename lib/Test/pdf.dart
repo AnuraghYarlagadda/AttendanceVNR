@@ -1,13 +1,6 @@
 import 'dart:collection';
-import 'dart:convert';
-
 import 'package:attendance/DataModels/studentDetails.dart';
-import 'package:attendance/StoragePermissions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_full_pdf_viewer/flutter_full_pdf_viewer.dart';
-
-import 'dart:io';
-
 import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 
 class PDF extends StatefulWidget {
@@ -26,7 +19,6 @@ class PDFState extends State<PDF> {
     super.initState();
     this.students = new LinkedHashSet<StudentDetails>();
     this.students = widget.students;
-    grantStoragePermissionAndCreateDir(context);
     genList();
   }
 
@@ -59,13 +51,31 @@ class PDFState extends State<PDF> {
       </head>
       <body>
       <img src="https://raw.githubusercontent.com/AnuraghYarlagadda/Admin/master/app/src/main/res/drawable-v24/pdfimage.jpg" alt="web-img">
+        
+        <h1 style='text-align:center;color:red;font-size:30px'>Smart Interviews</h1>
         <table style="width:100%">
-        <caption>Smart Interviews</caption>
         <thead>
         <tr>
-        <th style='text-align:center'>S. No. </th>
-        <th style='text-align:center'>HT No.</th>
-        <th style='text-align:center'>Student Name</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Time Stamp</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Year</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Attendance</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td style='text-align:center'>12/22/2020 18:04:22</td>
+          <td style='text-align:center'>III</td>
+          <td style='text-align:center'>Present</td>
+          </tr>
+        </tbody>
+        </table>
+        <br><br>
+        <table style="width:100%">
+        <thead>
+        <tr>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>S. No.</th>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>H. T. No.</th>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>Name of the Student</th>
         </tr>
         </thead>
         <tbody>
