@@ -20,3 +20,26 @@ grantStoragePermissionAndCreateDir(BuildContext context) {
       createandgetDirectory(context);
   });
 }
+
+grantBluetoothPermissions(BuildContext context) {
+  Permission.contacts.request().then((onValue) {
+    if (onValue == PermissionStatus.permanentlyDenied) {
+      Fluttertoast.showToast(
+          msg: "Enable Contact Permission in Settings!",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.red,
+          textColor: Colors.white);
+      openAppSettingsVNR();
+    } else if (onValue == PermissionStatus.denied)
+      grantBluetoothPermissions(context);
+    else if (onValue == PermissionStatus.granted) {}
+  });
+}
+
+getPermissions(BuildContext context) {
+  [Permission.storage, Permission.contacts].request().then((onValue) {
+    print(onValue);
+    if (onValue[Permission.storage] == PermissionStatus.granted)
+      createandgetDirectory(context);
+  });
+}

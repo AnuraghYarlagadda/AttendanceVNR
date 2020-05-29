@@ -1,6 +1,8 @@
-import 'package:attendance/Test/excel.dart';
-import 'package:flutter/material.dart';
+import 'package:attendance/contacts.dart';
+import 'package:attendance/home.dart';
+import 'package:attendance/manageAdmins.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +22,15 @@ class MyApp extends StatelessWidget {
         },
         child: MaterialApp(
           title: "VNR CSE",
-          home: Excel(),
+          home: Home(),
           debugShowCheckedModeBanner: false,
+          routes: {
+            "home": (context) => Home(),
+            "manageAdmins": (context) =>
+                ManageAdmin(ModalRoute.of(context).settings.arguments),
+            "contacts": (context) =>
+                ContactsPage(ModalRoute.of(context).settings.arguments),
+          },
         ));
   }
 }
