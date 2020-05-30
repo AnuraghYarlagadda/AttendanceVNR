@@ -50,7 +50,7 @@ class PDFState extends State<PDF> {
         </style>
       </head>
       <body>
-      <img src="https://raw.githubusercontent.com/AnuraghYarlagadda/Admin/master/app/src/main/res/drawable-v24/pdfimage.jpg" alt="web-img">
+      <img src="https://img.techpowerup.org/200530/logo-new-1-converted-1.png" width="1100" height="300" alt="web-img">
         
         <h1 style='text-align:center;color:red;font-size:30px'>Smart Interviews</h1>
         <table style="width:100%">

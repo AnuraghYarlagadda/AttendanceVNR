@@ -1,34 +1,27 @@
-import 'dart:collection';
-
-import 'package:attendance/DataModels/adminDetails.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class CourseDetails {
-  String courseName, facultyName, venue;
-  int phoneFaculty, year;
-  LinkedHashSet<AdminDetails> courseAdmins;
-
-  CourseDetails(
-    this.courseName,
-    this.facultyName,
-  );
-
+  String courseName, trainerName, venue, year;
+  List phone;
+  bool lock;
+  CourseDetails(this.courseName, this.trainerName, this.venue, this.year,
+      this.phone, this.lock);
   CourseDetails.fromSnapshot(DataSnapshot snapshot)
       : courseName = snapshot.value["courseName"],
-        facultyName = snapshot.value["facultyName"],
+        trainerName = snapshot.value["trainerName"],
         venue = snapshot.value["venue"],
-        phoneFaculty = snapshot.value["phoneFaculty"],
         year = snapshot.value["year"],
-        courseAdmins = snapshot.value["courseAdmins"];
+        phone = snapshot.value["phone"],
+        lock = snapshot.value["lock"];
 
   toJson() {
     return {
       "courseName": courseName,
-      "facultyName": facultyName,
+      "trainerName": trainerName,
       "venue": venue,
-      "phoneFaculty": phoneFaculty,
       "year": year,
-      "courseAdmins": courseAdmins
+      "phone": phone,
+      "lock": lock
     };
   }
 }

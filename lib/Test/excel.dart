@@ -25,7 +25,7 @@ class ExcelState extends State<Excel> {
           print(file);
           var bytes = file.readAsBytesSync();
           var decoder = SpreadsheetDecoder.decodeBytes(bytes);
-          var table = decoder.tables['Javascript Frameworks'];
+          var table = decoder.tables['smart Interviews'];
           print(decoder.tables.keys);
           var j;
           for (var i = 0; i < table.maxRows; i++) {

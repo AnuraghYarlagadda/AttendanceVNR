@@ -1,7 +1,10 @@
+import 'package:attendance/Settings.dart';
 import 'package:attendance/StoragePermissions.dart';
+import 'package:attendance/addCourse.dart';
 import 'package:attendance/login.dart';
 import 'package:attendance/restrictUser.dart';
 import 'package:attendance/signin.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -179,14 +182,6 @@ class HomeState extends State<Home> {
                                                     fontStyle:
                                                         FontStyle.normal),
                                               ),
-                                              subtitle: Text(
-                                                "- Add or Delete Admins \n- Grant or Revoke Permissions",
-                                                style: TextStyle(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                    fontStyle:
-                                                        FontStyle.italic),
-                                              ),
                                               trailing: IconButton(
                                                   icon: Icon(
                                                     Icons.settings,
@@ -211,6 +206,123 @@ class HomeState extends State<Home> {
                                           : Padding(
                                               padding: EdgeInsets.all(0),
                                             ),
+                                      ListTile(
+                                          title: Text(
+                                            "Add Course",
+                                            style: TextStyle(
+                                                fontSize: 25,
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FontStyle.normal),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.add),
+                                            iconSize: 35,
+                                            color: Colors.green,
+                                            onPressed: () async {
+                                              await (Connectivity()
+                                                      .checkConnectivity())
+                                                  .then((onValue) {
+                                                if (onValue ==
+                                                    ConnectivityResult.none) {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          "No Active Internet Connection!",
+                                                      toastLength:
+                                                          Toast.LENGTH_SHORT,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      textColor: Colors.white);
+                                                  openWIFISettingsVNR();
+                                                } else {
+                                                  if (this
+                                                          .currentAdmins
+                                                          .where((item) => (item
+                                                                      .email ==
+                                                                  this.userEmail &&
+                                                              item.permission))
+                                                          .length >
+                                                      0) {
+                                                    Navigator.of(context)
+                                                        .pushNamed("addCourse");
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Permission Denied ",
+                                                        toastLength:
+                                                            Toast.LENGTH_LONG,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        textColor:
+                                                            Colors.white);
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          )),
+                                      new Divider(
+                                        height: 2.0,
+                                        thickness: 2.5,
+                                      ),
+                                      ListTile(
+                                          title: Text(
+                                            "Courses",
+                                            style: TextStyle(
+                                                fontSize: 25,
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FontStyle.normal),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.remove_red_eye),
+                                            iconSize: 35,
+                                            color: Colors.orange,
+                                            onPressed: () async {
+                                              await (Connectivity()
+                                                      .checkConnectivity())
+                                                  .then((onValue) {
+                                                if (onValue ==
+                                                    ConnectivityResult.none) {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          "No Active Internet Connection!",
+                                                      toastLength:
+                                                          Toast.LENGTH_SHORT,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      textColor: Colors.white);
+                                                  openWIFISettingsVNR();
+                                                } else {
+                                                  if (this
+                                                          .currentAdmins
+                                                          .where((item) => (item
+                                                                      .email ==
+                                                                  this.userEmail &&
+                                                              item.permission))
+                                                          .length >
+                                                      0) {
+                                                    Navigator.of(context)
+                                                        .pushNamed(
+                                                            "listOfCourses");
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Permission Denied ",
+                                                        toastLength:
+                                                            Toast.LENGTH_LONG,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        textColor:
+                                                            Colors.white);
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          )),
+                                      new Divider(
+                                        height: 2.0,
+                                        thickness: 2.5,
+                                      ),
                                     ])))
                         : NoAccess());
   }

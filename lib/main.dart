@@ -1,8 +1,11 @@
+import 'package:attendance/Test/excel.dart';
+import 'package:attendance/addCourse.dart';
 import 'package:attendance/contacts.dart';
 import 'package:attendance/home.dart';
 import 'package:attendance/manageAdmins.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:attendance/listOfCourses.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +33,9 @@ class MyApp extends StatelessWidget {
                 ManageAdmin(ModalRoute.of(context).settings.arguments),
             "contacts": (context) =>
                 ContactsPage(ModalRoute.of(context).settings.arguments),
+            "addCourse": (context) =>
+                AddCourse(ModalRoute.of(context).settings.arguments),
+            "listOfCourses": (context) => DisplayCoursesList(),
           },
         ));
   }

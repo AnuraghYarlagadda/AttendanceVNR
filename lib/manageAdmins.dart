@@ -34,39 +34,43 @@ class ManageAdminState extends State<ManageAdmin> {
     this.admins = <AdminDetails>{};
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
+    print(widget.args);
     if (widget.args != null) {
       Contact contact = widget.args["contact"];
       emailController.text = widget.args["email"];
-      this.contactWidget.add(Padding(
-            padding: EdgeInsets.all(5),
-            child: Text(
-              "Contact : ",
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-            ),
-          ));
-      this.contactWidget.add(Padding(
-            padding: EdgeInsets.all(5),
-            child: Text(
-              contact.displayName.trim().toString(),
-              style: TextStyle(
-                  fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
-            ),
-          ));
-      if (contact.phones != null) {
-        contact.phones.forEach((f) {
-          this.phones.add(f.value.toLowerCase().trim().toString());
-        });
-        this.phones.forEach((v) {
-          this.contactWidget.add(Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(
-                  v,
-                  style: TextStyle(
-                      fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
-                ),
-              ));
-        });
+      if (contact != null) {
+        this.contactWidget.add(Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                "Contact : ",
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+            ));
+        this.contactWidget.add(Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                contact.displayName.trim().toString(),
+                style: TextStyle(
+                    fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
+              ),
+            ));
+        if (contact.phones != null) {
+          contact.phones.forEach((f) {
+            this.phones.add(f.value.toLowerCase().trim().toString());
+          });
+          this.phones.forEach((v) {
+            this.contactWidget.add(Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    v,
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ));
+          });
+        }
       }
     }
     print(this.admins);
@@ -414,9 +418,12 @@ class ManageAdminState extends State<ManageAdmin> {
                                 color: Colors.blue,
                               ),
                               onPressed: () {
-                                Navigator.of(context).pushReplacementNamed(
+                                Navigator.of(context).pushNamed(
                                     "contacts",
-                                    arguments: emailController.text.trim());
+                                    arguments: {
+                                      "email": emailController.text.trim(),
+                                      "route": "manageAdmins",
+                                    });
                               },
                             ),
                           ),
