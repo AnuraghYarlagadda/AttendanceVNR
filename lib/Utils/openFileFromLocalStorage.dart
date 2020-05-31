@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:attendance/navigateToPlayStore.dart';
+import 'package:attendance/Utils/navigateToPlayStore.dart';
 import './Settings.dart';
 
 Future<void> openFile(

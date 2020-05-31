@@ -32,10 +32,10 @@ class AddCourseState extends State<AddCourse> {
   @override
   void initState() {
     super.initState();
+    print(widget.args);
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
     this.phone = [];
-    print(widget.args);
     if (widget.args != null) {
       Contact contact = widget.args["contact"];
       courseNameController.text = widget.args["courseName"];

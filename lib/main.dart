@@ -3,6 +3,7 @@ import 'package:attendance/addCourse.dart';
 import 'package:attendance/contacts.dart';
 import 'package:attendance/home.dart';
 import 'package:attendance/manageAdmins.dart';
+import 'package:attendance/viewAndEditCourse.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:attendance/listOfCourses.dart';
@@ -36,6 +37,8 @@ class MyApp extends StatelessWidget {
             "addCourse": (context) =>
                 AddCourse(ModalRoute.of(context).settings.arguments),
             "listOfCourses": (context) => DisplayCoursesList(),
+            "courseDetails": (context) =>
+                ViewAndEditCourse(ModalRoute.of(context).settings.arguments),
           },
         ));
   }

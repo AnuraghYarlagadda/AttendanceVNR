@@ -1,9 +1,8 @@
-import 'package:attendance/Settings.dart';
-import 'package:attendance/StoragePermissions.dart';
-import 'package:attendance/addCourse.dart';
-import 'package:attendance/login.dart';
-import 'package:attendance/restrictUser.dart';
-import 'package:attendance/signin.dart';
+import 'package:attendance/Utils/Settings.dart';
+import 'package:attendance/Utils/StoragePermissions.dart';
+import 'package:attendance/Utils/login.dart';
+import 'package:attendance/Utils/restrictUser.dart';
+import 'package:attendance/Utils/signin.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

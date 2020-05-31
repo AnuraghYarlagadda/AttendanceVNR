@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:attendance/DataModels/courseDetails.dart';
-import 'package:attendance/settings.dart';
+import 'package:attendance/Utils/settings.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -88,26 +88,6 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
         }
       });
       print(this.courses.length);
-    });
-  }
-
-  getData(BuildContext context, String courseName) {
-    final ref = fb.reference();
-    String id = courseName.trim().toLowerCase();
-    ref.child("Courses").child(id).once().then((DataSnapshot data) {
-      setState(() {
-        this.courseDetails = CourseDetails.fromSnapshot(data);
-        if (this.courseDetails != null) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) {
-                // return EditOrViewCourseDetails(
-                //     this.courseDetails);
-              },
-            ),
-          );
-        }
-      });
     });
   }
 
@@ -229,7 +209,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                 },
                               ),
                               subtitle: Text(
-                                'Select a year to view Courses!',
+                                'Filter Year!',
                                 style: new TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blue,
@@ -401,12 +381,19 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                                                   Colors.white);
                                                           openWIFISettingsVNR();
                                                         } else {
-                                                          getData(
-                                                              context,
-                                                              items
-                                                                  .elementAt(
-                                                                      index)
-                                                                  .coorseName);
+                                                          Navigator.of(context)
+                                                              .pushNamed(
+                                                                  "courseDetails",
+                                                                  arguments: {
+                                                                "courseName": items
+                                                                    .elementAt(
+                                                                        index)
+                                                                    .courseName
+                                                                    .toString()
+                                                                    .toLowerCase(),
+                                                                "route":
+                                                                    "listOfCourses"
+                                                              });
                                                         }
                                                       });
                                                     }),

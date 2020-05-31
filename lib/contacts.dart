@@ -159,6 +159,23 @@ class _ContactsPageState extends State<ContactsPage> {
                                       "contact": this.items?.elementAt(index),
                                       "email": widget.args["email"],
                                     });
+                              } else if (widget.args["route"] ==
+                                  "courseDetails") {
+                                Navigator.of(context).popUntil(
+                                    ModalRoute.withName('courseDetails'));
+                                Navigator.of(context).pushReplacementNamed(
+                                    "courseDetails",
+                                    arguments: {
+                                      "contact": this.items?.elementAt(index),
+                                      "courseDetails":
+                                          widget.args["courseDetails"],
+                                      "editTrainer": widget.args["editTrainer"],
+                                      "editVenue": widget.args["editVenue"],
+                                      "update": widget.args["update"],
+                                      "trainerName": widget.args["trainerName"],
+                                      "venue": widget.args["venue"],
+                                      "route": "contacts"
+                                    });
                               }
                             },
                           );
@@ -184,6 +201,18 @@ class _ContactsPageState extends State<ContactsPage> {
       Navigator.of(context).pushReplacementNamed("manageAdmins", arguments: {
         "contact": null,
         "email": widget.args["email"],
+      });
+    } else if (widget.args["route"] == "courseDetails") {
+      Navigator.of(context).popUntil(ModalRoute.withName('courseDetails'));
+      Navigator.of(context).pushReplacementNamed("courseDetails", arguments: {
+        "contact": null,
+        "courseDetails": widget.args["courseDetails"],
+        "editTrainer": widget.args["editTrainer"],
+        "editVenue": widget.args["editVenue"],
+        "update": widget.args["update"],
+        "trainerName": widget.args["trainerName"],
+        "venue": widget.args["venue"],
+        "route": "contacts"
       });
     }
   }

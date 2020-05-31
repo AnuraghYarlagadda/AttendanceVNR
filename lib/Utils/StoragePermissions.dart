@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:attendance/Settings.dart';
+import 'package:attendance/Utils/Settings.dart';
 import './Storagedirectory.dart';
 import 'package:flutter/material.dart';
 
