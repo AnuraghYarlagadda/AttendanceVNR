@@ -176,6 +176,18 @@ class _ContactsPageState extends State<ContactsPage> {
                                       "venue": widget.args["venue"],
                                       "route": "contacts"
                                     });
+                              } else if (widget.args["route"] ==
+                                  "manageCordinators") {
+                                Navigator.of(context).popUntil(
+                                    ModalRoute.withName('manageCordinators'));
+                                Navigator.of(context).pushReplacementNamed(
+                                    "manageCordinators",
+                                    arguments: {
+                                      "contact": this.items?.elementAt(index),
+                                      "email": widget.args["email"],
+                                      "courseName": widget.args["courseName"],
+                                      "route": "contacts"
+                                    });
                               }
                             },
                           );
@@ -212,6 +224,15 @@ class _ContactsPageState extends State<ContactsPage> {
         "update": widget.args["update"],
         "trainerName": widget.args["trainerName"],
         "venue": widget.args["venue"],
+        "route": "contacts"
+      });
+    } else if (widget.args["route"] == "manageCordinators") {
+      Navigator.of(context).popUntil(ModalRoute.withName('manageCordinators'));
+      Navigator.of(context)
+          .pushReplacementNamed("manageCordinators", arguments: {
+        "contact": null,
+        "email": widget.args["email"],
+        "courseName": widget.args["courseName"],
         "route": "contacts"
       });
     }

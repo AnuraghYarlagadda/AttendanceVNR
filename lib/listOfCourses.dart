@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:attendance/DataModels/courseCoordinatorsDetails.dart';
 import 'package:attendance/DataModels/courseDetails.dart';
 import 'package:attendance/Utils/settings.dart';
 import 'package:connectivity/connectivity.dart';
@@ -97,9 +98,41 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
     ref.child("Courses").child(courseName).child("lock").set(lock);
   }
 
-  delFirebase(String courseName) {
+  delFirebase(String courseName) async {
     final ref = fb.reference();
     ref.child("Courses").child(courseName).remove();
+    List keys = [];
+    await ref.child("CourseCoordinators").once().then((data) {
+      keys.addAll(data.value.keys);
+    });
+    keys.forEach((f) async {
+      await ref.child("CourseCoordinators").child(f).once().then((data) {
+        CourseCoordinatorsDetails coordinatorsDetails =
+            CourseCoordinatorsDetails.fromSnapshot(data);
+        print(coordinatorsDetails.courses);
+        coordinatorsDetails.courses.removeWhere((a, b) => a == courseName);
+        print(coordinatorsDetails.courses);
+        if (coordinatorsDetails.courses.length == 0) {
+          //del user n firebase
+          String id = coordinatorsDetails.email.replaceAll('.', ',');
+          id = id.replaceAll('@', ',');
+          id = id.replaceAll('#', ',');
+          id = id.replaceAll('[', ',');
+          id = id.replaceAll(']', ',');
+          ref.child("CourseCoordinators").child(id).remove();
+        } else {
+          String id = coordinatorsDetails.email.replaceAll('.', ',');
+          id = id.replaceAll('@', ',');
+          id = id.replaceAll('#', ',');
+          id = id.replaceAll('[', ',');
+          id = id.replaceAll(']', ',');
+          ref
+              .child("CourseCoordinators")
+              .child(id)
+              .set(coordinatorsDetails.toJson());
+        }
+      });
+    });
   }
 
   void filterSearchResults(String year) {
@@ -462,8 +495,8 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
         style: TextStyle(
             color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
       ),
-      onPressed: () {
-        delFirebase(courseName.toLowerCase());
+      onPressed: () async {
+        await delFirebase(courseName.toLowerCase());
         Fluttertoast.showToast(
             msg: courseName + " Deleted!",
             toastLength: Toast.LENGTH_SHORT,

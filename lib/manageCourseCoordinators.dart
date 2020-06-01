@@ -1,6 +1,5 @@
 import 'dart:collection';
-
-import 'package:attendance/DataModels/adminDetails.dart';
+import 'package:attendance/DataModels/courseCoordinatorsDetails.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -9,71 +8,81 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ManageAdmin extends StatefulWidget {
+class ManageCordinators extends StatefulWidget {
   final LinkedHashMap args;
-  const ManageAdmin(this.args);
+  const ManageCordinators(this.args);
   @override
-  ManageAdminState createState() => ManageAdminState();
+  ManageCordinatorsState createState() => ManageCordinatorsState();
 }
 
-class ManageAdminState extends State<ManageAdmin> {
+class ManageCordinatorsState extends State<ManageCordinators> {
   TextEditingController emailController = new TextEditingController();
-  var admins;
+  var coordinators;
   final fb = FirebaseDatabase.instance;
   double width, height;
   var defaultAdmins;
-  AdminDetails adminDetails;
+  CourseCoordinatorsDetails coordinatorsDetails;
   List<Widget> contactWidget;
   LinkedHashSet phones;
 
   Future<void> _launched;
 
+  LinkedHashMap courses;
+  String courseName;
+
   @override
   void initState() {
     super.initState();
-    this.admins = <AdminDetails>{};
+    this.coordinators = <CourseCoordinatorsDetails>{};
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
+    this.courseName = "";
+    this.courses = new LinkedHashMap<dynamic, bool>();
     print(widget.args);
     if (widget.args != null) {
-      Contact contact = widget.args["contact"];
-      emailController.text = widget.args["email"];
-      if (contact != null) {
-        this.contactWidget.add(Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                "Contact : ",
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ));
-        this.contactWidget.add(Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                contact.displayName.trim().toString(),
-                style: TextStyle(
-                    fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
-              ),
-            ));
-        if (contact.phones != null) {
-          contact.phones.forEach((f) {
-            this.phones.add(f.value.toLowerCase().trim().toString());
-          });
-          this.phones.forEach((v) {
-            this.contactWidget.add(Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text(
-                    v,
-                    style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ));
-          });
+      if (widget.args["route"] == "courseDetails") {
+        this.courseName = widget.args["courseName"];
+      } else if (widget.args["route"] == "contacts") {
+        Contact contact = widget.args["contact"];
+        emailController.text = widget.args["email"];
+        this.courseName = widget.args["courseName"];
+        if (contact != null) {
+          this.contactWidget.add(Padding(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  "Contact : ",
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+              ));
+          this.contactWidget.add(Padding(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  contact.displayName.trim().toString(),
+                  style: TextStyle(
+                      fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
+                ),
+              ));
+          if (contact.phones != null) {
+            contact.phones.forEach((f) {
+              this.phones.add(f.value.toLowerCase().trim().toString());
+            });
+            this.phones.forEach((v) {
+              this.contactWidget.add(Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      v,
+                      style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ));
+            });
+          }
         }
       }
     }
-    print(this.admins);
+    print(this.coordinators);
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
@@ -90,86 +99,189 @@ class ManageAdminState extends State<ManageAdmin> {
   }
 
   getData() {
-    final ref = fb.reference().child("Admins");
+    final ref = fb.reference().child("CourseCoordinators");
     ref.onChildAdded.listen((onData) {
-      adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
+      coordinatorsDetails =
+          CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
       setState(() {
         try {
-          this.admins.add(adminDetails);
+          print("On ADDED");
+          print(coordinatorsDetails.email);
+          print(coordinatorsDetails.courses);
+          if (coordinatorsDetails.courses.containsKey(this.courseName)) {
+            this.coordinators.add(coordinatorsDetails);
+          }
+          print(this.coordinators.length);
         } catch (identifier) {
           print("Added  ");
           print(identifier);
         }
       });
-      print(this.admins.length);
+      print(this.courseName);
+      print(this.coordinators.length);
     });
     ref.onChildRemoved.listen((onData) {
       print(onData.snapshot.value);
-      adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
+      coordinatorsDetails =
+          CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
       setState(() {
+        print("On REMOVED");
+        print(coordinatorsDetails.email);
+        print(coordinatorsDetails.courses);
         try {
-          this.admins.removeWhere((value) => value.email == adminDetails.email);
+          print("Removed");
         } catch (identifier) {
           print("Removed  ");
           print(identifier);
         }
       });
       print("Manage");
-      print(this.admins.length);
+      print(this.coordinators.length);
     });
     ref.onChildChanged.listen((onData) {
-      adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
+      coordinatorsDetails =
+          CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
       setState(() {
-        try {
-          this.admins.forEach((value) {
-            if (adminDetails.email == value.email) {
-              value.permission = adminDetails.permission;
-              value.phone = adminDetails.phone;
+        print("On CHANGED");
+        print(coordinatorsDetails.email);
+        print(coordinatorsDetails.courses);
+        if (coordinatorsDetails.courses != null) {
+          if (coordinatorsDetails.courses.containsKey(this.courseName)) {
+            if (this
+                    .coordinators
+                    .where((item) => (item.email == coordinatorsDetails.email))
+                    .length >
+                0) {
+              this.coordinators.removeWhere(
+                  (item) => item.email == coordinatorsDetails.email);
+              this.coordinators.add(coordinatorsDetails);
+            } else {
+              this.coordinators.add(coordinatorsDetails);
             }
-          });
-        } catch (identifier) {
-          print("Changed  ");
-          print(identifier);
+          } else {
+            print("akkada");
+            if (this
+                    .coordinators
+                    .where((item) => (item.email == coordinatorsDetails.email))
+                    .length >
+                0) {
+              this.coordinators.removeWhere(
+                  (item) => item.email == coordinatorsDetails.email);
+            }
+          }
+        } else {
+          print("ikkada");
+          if (this
+                  .coordinators
+                  .where((item) => (item.email == coordinatorsDetails.email))
+                  .length >
+              0) {
+            this
+                .coordinators
+                .removeWhere((item) => item.email == coordinatorsDetails.email);
+          }
+          String id = coordinatorsDetails.email.replaceAll('.', ',');
+          id = id.replaceAll('@', ',');
+          id = id.replaceAll('#', ',');
+          id = id.replaceAll('[', ',');
+          id = id.replaceAll(']', ',');
+          ref.child(id).remove();
         }
       });
-      print(this.admins.length);
+      print(this.courseName);
+      print(this.coordinators.length);
     });
   }
 
-  postFirebase(AdminDetails adminDetails) {
-    print(adminDetails.email + "    " + (adminDetails.permission.toString()));
-    adminDetails.phone.forEach((f) {
-      print(f);
+  postFirebase(CourseCoordinatorsDetails coordinatorsDetails) {
+    String id = coordinatorsDetails.email.replaceAll('.', ',');
+    LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
+    id = id.replaceAll('@', ',');
+    id = id.replaceAll('#', ',');
+    id = id.replaceAll('[', ',');
+    id = id.replaceAll(']', ',');
+    final ref = fb.reference();
+    ref
+        .child("CourseCoordinators")
+        .child(id)
+        .child("courses")
+        .once()
+        .then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+        ref
+            .child("CourseCoordinators")
+            .child(id)
+            .set(coordinatorsDetails.toJson());
+      } else {
+        courses = onValue.value;
+        coordinatorsDetails.courses.forEach((k, v) {
+          courses[k] = v;
+        });
+        coordinatorsDetails.courses = courses;
+        ref
+            .child("CourseCoordinators")
+            .child(id)
+            .set(coordinatorsDetails.toJson());
+      }
     });
-    String id = adminDetails.email.replaceAll('.', ',');
-    id = id.replaceAll('@', ',');
-    id = id.replaceAll('#', ',');
-    id = id.replaceAll('[', ',');
-    id = id.replaceAll(']', ',');
-    final ref = fb.reference();
-    ref.child("Admins").child(id).set(adminDetails.toJson());
   }
 
-  changePermissionFirebase(String email, bool permission) {
-    final ref = fb.reference();
-    //print(email);
-    String id = email.replaceAll('.', ',');
+  changePermissionFirebase(
+      CourseCoordinatorsDetails coordinatorsDetails, bool permission) {
+    String id = coordinatorsDetails.email.replaceAll('.', ',');
+    LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
-    ref.child("Admins").child(id).child("permission").set(permission);
+    final ref = fb.reference();
+    ref
+        .child("CourseCoordinators")
+        .child(id)
+        .child("courses")
+        .once()
+        .then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+      } else {
+        courses = onValue.value;
+        courses[this.courseName] = permission;
+        coordinatorsDetails.courses = courses;
+        ref
+            .child("CourseCoordinators")
+            .child(id)
+            .set(coordinatorsDetails.toJson());
+      }
+    });
   }
 
-  delFirebase(String email) {
-    final ref = fb.reference();
-    //print(email);
-    String id = email.replaceAll('.', ',');
+  delFirebase(CourseCoordinatorsDetails coordinatorsDetails) {
+    String id = coordinatorsDetails.email.replaceAll('.', ',');
+    LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
-    ref.child("Admins").child(id).remove();
+    final ref = fb.reference();
+    ref
+        .child("CourseCoordinators")
+        .child(id)
+        .child("courses")
+        .once()
+        .then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+      } else {
+        courses = onValue.value;
+        courses.remove(this.courseName);
+        coordinatorsDetails.courses = courses;
+        ref
+            .child("CourseCoordinators")
+            .child(id)
+            .set(coordinatorsDetails.toJson());
+      }
+    });
   }
 
   Future<void> _makePhoneCall(String url) async {
@@ -186,7 +298,7 @@ class ManageAdminState extends State<ManageAdmin> {
     this.width = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Manage Admins"),
+          title: Text("Manage Coordinators"),
           leading: Icon(Icons.group_add),
         ),
         body: OfflineBuilder(
@@ -243,7 +355,8 @@ class ManageAdminState extends State<ManageAdmin> {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: <Widget>[
-                  (this.admins == null)
+                  Text(this.courseName),
+                  (this.coordinators == null)
                       ? Container(
                           padding: EdgeInsets.all(15),
                           child: CircularProgressIndicator())
@@ -251,14 +364,17 @@ class ManageAdminState extends State<ManageAdmin> {
                           padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: this.admins.length,
+                          itemCount: this.coordinators.length,
                           itemBuilder: (BuildContext context, int index) {
-                            if (this.admins.elementAt(index) != null) {
+                            if (this.coordinators.elementAt(index) != null) {
                               return new Column(
                                 children: <Widget>[
                                   new ListTile(
                                       title: new Text(
-                                        this.admins.elementAt(index).email,
+                                        this
+                                            .coordinators
+                                            .elementAt(index)
+                                            .email,
                                         style: TextStyle(
                                             fontSize: 13.5,
                                             color: Colors.black,
@@ -273,7 +389,7 @@ class ManageAdminState extends State<ManageAdmin> {
                                               color: Colors.blue,
                                               onPressed: () {
                                                 if (this
-                                                        .admins
+                                                        .coordinators
                                                         .elementAt(index)
                                                         .phone
                                                         .length ==
@@ -281,33 +397,33 @@ class ManageAdminState extends State<ManageAdmin> {
                                                   _launched = _makePhoneCall(
                                                       'tel:' +
                                                           this
-                                                              .admins
+                                                              .coordinators
                                                               .elementAt(index)
                                                               .phone[0]);
                                                 } else {
                                                   showContacts(
                                                       context,
                                                       this
-                                                          .admins
+                                                          .coordinators
                                                           .elementAt(index)
                                                           .phone);
                                                 }
                                               }),
                                           !this.defaultAdmins.contains(this
-                                                  .admins
+                                                  .coordinators
                                                   .elementAt(index)
                                                   .email)
                                               ? Switch(
                                                   value: this
-                                                      .admins
+                                                      .coordinators
                                                       .elementAt(index)
-                                                      .permission,
+                                                      .courses[this.courseName],
                                                   onChanged: (value) {
                                                     value
                                                         ? Fluttertoast.showToast(
                                                             msg: "Granted Permission to " +
                                                                 this
-                                                                    .admins
+                                                                    .coordinators
                                                                     .elementAt(
                                                                         index)
                                                                     .email,
@@ -320,7 +436,7 @@ class ManageAdminState extends State<ManageAdmin> {
                                                         : Fluttertoast.showToast(
                                                             msg: "Revoked Permission to " +
                                                                 this
-                                                                    .admins
+                                                                    .coordinators
                                                                     .elementAt(
                                                                         index)
                                                                     .email,
@@ -332,13 +448,13 @@ class ManageAdminState extends State<ManageAdmin> {
                                                                 Colors.white);
                                                     changePermissionFirebase(
                                                         this
-                                                            .admins
-                                                            .elementAt(index)
-                                                            .email,
+                                                            .coordinators
+                                                            .elementAt(index),
                                                         !this
-                                                            .admins
-                                                            .elementAt(index)
-                                                            .permission);
+                                                                .coordinators
+                                                                .elementAt(index)
+                                                                .courses[
+                                                            this.courseName]);
                                                   },
                                                   activeTrackColor:
                                                       Colors.green,
@@ -349,7 +465,7 @@ class ManageAdminState extends State<ManageAdmin> {
                                               : Padding(
                                                   padding: EdgeInsets.all(0)),
                                           !this.defaultAdmins.contains(this
-                                                  .admins
+                                                  .coordinators
                                                   .elementAt(index)
                                                   .email)
                                               ? IconButton(
@@ -361,9 +477,8 @@ class ManageAdminState extends State<ManageAdmin> {
                                                     showAlertDialog(
                                                         context,
                                                         this
-                                                            .admins
-                                                            .elementAt(index)
-                                                            .email);
+                                                            .coordinators
+                                                            .elementAt(index));
                                                   })
                                               : Padding(
                                                   padding: EdgeInsets.all(0)),
@@ -380,8 +495,8 @@ class ManageAdminState extends State<ManageAdmin> {
                             }
                           },
                         ),
-                  this.admins.length == 0
-                      ? Text("")
+                  this.coordinators.length == 0
+                      ? Padding(padding: EdgeInsets.all(0))
                       : Padding(padding: EdgeInsets.all(25)),
                   SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -421,7 +536,8 @@ class ManageAdminState extends State<ManageAdmin> {
                                 Navigator.of(context)
                                     .pushNamed("contacts", arguments: {
                                   "email": emailController.text.trim(),
-                                  "route": "manageAdmins",
+                                  "route": "manageCordinators",
+                                  "courseName": this.courseName,
                                 });
                               },
                             ),
@@ -448,23 +564,29 @@ class ManageAdminState extends State<ManageAdmin> {
                                           textColor: Colors.white);
                                     } else {
                                       if (this.phones.length != 0) {
-                                        AdminDetails adminDetails;
+                                        CourseCoordinatorsDetails
+                                            coordinatorsDetails;
                                         if (this.defaultAdmins.contains(
                                             emailController.text.trim())) {
-                                          adminDetails = new AdminDetails(
-                                              emailController.text.trim(),
-                                              true,
-                                              this.phones.toList());
+                                          this.courses[this.courseName] = true;
+                                          coordinatorsDetails =
+                                              new CourseCoordinatorsDetails(
+                                                  emailController.text.trim(),
+                                                  this.phones.toList(),
+                                                  this.courses);
                                         } else {
-                                          adminDetails = new AdminDetails(
-                                              emailController.text.trim(),
-                                              false,
-                                              this.phones.toList());
+                                          this.courses[this.courseName] = false;
+                                          coordinatorsDetails =
+                                              new CourseCoordinatorsDetails(
+                                                  emailController.text.trim(),
+                                                  this.phones.toList(),
+                                                  this.courses);
                                         }
-                                        postFirebase(adminDetails);
+                                        print(coordinatorsDetails.toJson());
+                                        postFirebase(coordinatorsDetails);
                                         Fluttertoast.showToast(
                                             msg: "User Added " +
-                                                adminDetails.email,
+                                                coordinatorsDetails.email,
                                             toastLength: Toast.LENGTH_SHORT,
                                             backgroundColor: Colors.green,
                                             textColor: Colors.white);
@@ -507,7 +629,7 @@ class ManageAdminState extends State<ManageAdmin> {
                             children: this.contactWidget,
                           ),
                         )
-                      : Padding(padding: EdgeInsets.all(0))
+                      : Padding(padding: EdgeInsets.all(0)),
                 ],
               ),
             )));
@@ -561,7 +683,8 @@ class ManageAdminState extends State<ManageAdmin> {
     }
   }
 
-  showAlertDialog(BuildContext context, String email) {
+  showAlertDialog(
+      BuildContext context, CourseCoordinatorsDetails coordinatorsDetails) {
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text(
@@ -580,9 +703,9 @@ class ManageAdminState extends State<ManageAdmin> {
             color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
       ),
       onPressed: () {
-        delFirebase(email);
+        delFirebase(coordinatorsDetails);
         Fluttertoast.showToast(
-            msg: "User Removed " + email,
+            msg: "User Removed " + coordinatorsDetails.email,
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.red,
             textColor: Colors.white);
@@ -593,7 +716,7 @@ class ManageAdminState extends State<ManageAdmin> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Delete Admin"),
-      content: Text(email),
+      content: Text(coordinatorsDetails.email),
       actions: [
         cancelButton,
         continueButton,

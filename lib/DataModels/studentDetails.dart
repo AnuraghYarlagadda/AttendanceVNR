@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class StudentDetails {
-  String rollNum,name;
+  String rollNum, name;
 
   StudentDetails(this.rollNum, this.name);
 

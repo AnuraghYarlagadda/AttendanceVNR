@@ -36,6 +36,7 @@ class AddCourseState extends State<AddCourse> {
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
     this.phone = [];
+    this.year = "";
     if (widget.args != null) {
       Contact contact = widget.args["contact"];
       courseNameController.text = widget.args["courseName"];
@@ -89,7 +90,7 @@ class AddCourseState extends State<AddCourse> {
           .child(courseDetails.courseName)
           .set(courseDetails.toJson());
       Fluttertoast.showToast(
-          msg: courseDetails.courseName + "Added Successfully!",
+          msg: courseDetails.courseName.toUpperCase() + " Added Successfully!",
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.green,
           textColor: Colors.white);

@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:attendance/DataModels/courseDetails.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -131,7 +130,8 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
           .child(courseDetails.courseName)
           .set(courseDetails.toJson());
       Fluttertoast.showToast(
-          msg: courseDetails.courseName + "Updated Successfully!",
+          msg:
+              courseDetails.courseName.toUpperCase() + " Updated Successfully!",
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.green,
           textColor: Colors.white);
@@ -147,7 +147,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: onBackPressed,
+        onWillPop: _onBackPressed,
         child: Scaffold(
           appBar: AppBar(
             title: Text(this.courseName.toUpperCase()),
@@ -401,7 +401,32 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                                 },
                                 child: Text("Update"),
                                 gradient: Gradients.cosmicFusion,
-                              )
+                              ),
+                        Card(
+                            elevation: 5,
+                            child: ListTile(
+                              title: Text(
+                                "Manage Course Co-Ordinators",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.settings,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                        "manageCordinators",
+                                        arguments: {
+                                          "route": "courseDetails",
+                                          "courseName": this.courseName
+                                        });
+                                  }),
+                            ))
                       ],
                     ),
                   ),
@@ -418,22 +443,6 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
   }
 
   showContacts(BuildContext context, List phone) {
-    Widget continueButton = FlatButton(
-      child: Text(
-        "Continue",
-        style: TextStyle(
-            color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
-      ),
-      onPressed: () {
-        Navigator.of(context).pop(); // dismiss dialog
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert =
-        AlertDialog(title: Text("Multiple Numbers"), actions: []);
-
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -466,41 +475,36 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     );
   }
 
-  Future<bool> onBackPressed() {
-    if (this.update == true) {
-      Widget cancelButton = FlatButton(
-        child: Text(
-          "YES",
-          style: TextStyle(
-              color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {
-          Navigator.of(context).pop(true);
-        },
-      );
-      Widget continueButton = FlatButton(
-        child: Text(
-          "NO",
-          style: TextStyle(
-              color: Colors.green, fontSize: 15, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {
-          Navigator.of(context).pop(false);
-        },
-      );
-      return showDialog(
-        context: context,
-        builder: (context) => new AlertDialog(
-          title: new Text('Are you sure?'),
-          content: new Text('Data not submitted!'),
-          actions: [
-            cancelButton,
-            continueButton,
-          ],
-        ),
-      );
-    } else {
-      Navigator.of(context).pop(true);
-    }
+  Future<bool> _onBackPressed() {
+    Widget cancelButton = FlatButton(
+      child: Text(
+        "YES",
+        style: TextStyle(
+            color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop(true);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text(
+        "NO",
+        style: TextStyle(
+            color: Colors.green, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop(false);
+      },
+    );
+    return showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+        title: new Text('Are you sure?'),
+        actions: [
+          cancelButton,
+          continueButton,
+        ],
+      ),
+    );
   }
 }
