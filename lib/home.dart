@@ -175,7 +175,7 @@ class HomeState extends State<Home> {
                                               title: Text(
                                                 "Manage Admins",
                                                 style: TextStyle(
-                                                    fontSize: 25,
+                                                    fontSize: 18,
                                                     color: Colors.indigo,
                                                     fontWeight: FontWeight.bold,
                                                     fontStyle:
@@ -184,7 +184,7 @@ class HomeState extends State<Home> {
                                               trailing: IconButton(
                                                   icon: Icon(
                                                     Icons.settings,
-                                                    size: 35,
+                                                    size: 25,
                                                     color: Colors.red,
                                                   ),
                                                   onPressed: () {
@@ -209,14 +209,14 @@ class HomeState extends State<Home> {
                                           title: Text(
                                             "Add Course",
                                             style: TextStyle(
-                                                fontSize: 25,
+                                                fontSize: 18,
                                                 color: Colors.indigo,
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle: FontStyle.normal),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.add),
-                                            iconSize: 35,
+                                            iconSize: 25,
                                             color: Colors.green,
                                             onPressed: () async {
                                               await (Connectivity()
@@ -267,14 +267,14 @@ class HomeState extends State<Home> {
                                           title: Text(
                                             "Courses",
                                             style: TextStyle(
-                                                fontSize: 25,
+                                                fontSize: 18,
                                                 color: Colors.indigo,
                                                 fontWeight: FontWeight.bold,
                                                 fontStyle: FontStyle.normal),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.remove_red_eye),
-                                            iconSize: 35,
+                                            iconSize: 25,
                                             color: Colors.orange,
                                             onPressed: () async {
                                               await (Connectivity()
@@ -303,6 +303,130 @@ class HomeState extends State<Home> {
                                                     Navigator.of(context)
                                                         .pushNamed(
                                                             "listOfCourses");
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Permission Denied ",
+                                                        toastLength:
+                                                            Toast.LENGTH_LONG,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        textColor:
+                                                            Colors.white);
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          )),
+                                      new Divider(
+                                        height: 2.0,
+                                        thickness: 2.5,
+                                      ),
+                                      ListTile(
+                                          title: Text(
+                                            "Year report Present Attendance",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FontStyle.normal),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.person_outline),
+                                            iconSize: 25,
+                                            color: Colors.green,
+                                            onPressed: () async {
+                                              await (Connectivity()
+                                                      .checkConnectivity())
+                                                  .then((onValue) {
+                                                if (onValue ==
+                                                    ConnectivityResult.none) {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          "No Active Internet Connection!",
+                                                      toastLength:
+                                                          Toast.LENGTH_SHORT,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      textColor: Colors.white);
+                                                  openWIFISettingsVNR();
+                                                } else {
+                                                  if (this
+                                                          .currentAdmins
+                                                          .where((item) => (item
+                                                                      .email ==
+                                                                  this.userEmail &&
+                                                              item.permission))
+                                                          .length >
+                                                      0) {
+                                                    Navigator.of(context)
+                                                        .pushNamed(
+                                                            "yearAttendance",
+                                                            arguments: {
+                                                          "what": "present"
+                                                        });
+                                                  } else {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Permission Denied ",
+                                                        toastLength:
+                                                            Toast.LENGTH_LONG,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        textColor:
+                                                            Colors.white);
+                                                  }
+                                                }
+                                              });
+                                            },
+                                          )),
+                                      new Divider(
+                                        height: 2.0,
+                                        thickness: 2.5,
+                                      ),
+                                      ListTile(
+                                          title: Text(
+                                            "Year report Absent Attendance",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.indigo,
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FontStyle.normal),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(Icons.person_outline),
+                                            iconSize: 25,
+                                            color: Colors.red,
+                                            onPressed: () async {
+                                              await (Connectivity()
+                                                      .checkConnectivity())
+                                                  .then((onValue) {
+                                                if (onValue ==
+                                                    ConnectivityResult.none) {
+                                                  Fluttertoast.showToast(
+                                                      msg:
+                                                          "No Active Internet Connection!",
+                                                      toastLength:
+                                                          Toast.LENGTH_SHORT,
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      textColor: Colors.white);
+                                                  openWIFISettingsVNR();
+                                                } else {
+                                                  if (this
+                                                          .currentAdmins
+                                                          .where((item) => (item
+                                                                      .email ==
+                                                                  this.userEmail &&
+                                                              item.permission))
+                                                          .length >
+                                                      0) {
+                                                    Navigator.of(context)
+                                                        .pushNamed(
+                                                            "yearAttendance",
+                                                            arguments: {
+                                                          "what": "absent"
+                                                        });
                                                   } else {
                                                     Fluttertoast.showToast(
                                                         msg:

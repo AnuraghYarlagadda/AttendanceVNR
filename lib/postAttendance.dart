@@ -196,125 +196,137 @@ class PostAttendanceState extends State<PostAttendance> {
                     ? Center(
                         child: SpinKitWave(
                             color: Colors.blue, type: SpinKitWaveType.start))
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    RaisedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          this.displayList.forEach((f) {
-                                            f.present = true;
-                                          });
-                                        });
-                                      },
-                                      child: Text("Check all"),
-                                      color: Colors.green,
-                                      textColor: Colors.white,
-                                    ),
-                                    RaisedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            this.displayList.forEach((f) {
-                                              f.present = false;
+                    : (this.displayList.length == 0 &&
+                            this.courseAttendance.students == null)
+                        ? Center(
+                            child:
+                                Text("EXCEL Sheet wasn't Added to the course!"))
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(10, 15, 10, 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        RaisedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              this.displayList.forEach((f) {
+                                                f.present = true;
+                                              });
                                             });
-                                          });
-                                        },
-                                        child: Text("Clear all"),
-                                        color: Colors.red,
-                                        textColor: Colors.white),
-                                  ],
-                                ),
-                              ),
-                              Scrollbar(
-                                  child: ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: this.displayList.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                            child: Card(
-                                                elevation: 5,
-                                                child: ListTile(
-                                                  title: Text(
-                                                    this
-                                                        .displayList[index]
-                                                        .rollNum,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 15,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  subtitle: Text(
-                                                    this
-                                                        .displayList[index]
-                                                        .name,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 12,
-                                                        fontStyle:
-                                                            FontStyle.italic,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  trailing: Checkbox(
-                                                      activeColor: Colors.green,
-                                                      value: this
-                                                          .displayList[index]
-                                                          .present,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          this
+                                          },
+                                          child: Text("Check all"),
+                                          color: Colors.green,
+                                          textColor: Colors.white,
+                                        ),
+                                        RaisedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                this.displayList.forEach((f) {
+                                                  f.present = false;
+                                                });
+                                              });
+                                            },
+                                            child: Text("Clear all"),
+                                            color: Colors.red,
+                                            textColor: Colors.white),
+                                      ],
+                                    ),
+                                  ),
+                                  Scrollbar(
+                                      child: ListView.builder(
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount: this.displayList.length,
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                                child: Card(
+                                                    elevation: 5,
+                                                    child: ListTile(
+                                                      title: Text(
+                                                        this
+                                                            .displayList[index]
+                                                            .rollNum,
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 15,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      subtitle: Text(
+                                                        this
+                                                            .displayList[index]
+                                                            .name,
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 12,
+                                                            fontStyle: FontStyle
+                                                                .italic,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      trailing: Checkbox(
+                                                          activeColor:
+                                                              Colors.green,
+                                                          value: this
                                                               .displayList[
                                                                   index]
-                                                              .present = value;
-                                                        });
-                                                      }),
-                                                )));
-                                      })),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: RaisedButton(
-                                    child: Text("Post Attendance"),
-                                    onPressed: () {
-                                      this.presentees.clear();
-                                      this.absentees.clear();
-                                      this.displayList.forEach((f) {
-                                        if (f.present == true) {
-                                          this.presentees.add(
-                                              new StudentDetails(
-                                                      f.rollNum, f.name)
-                                                  .toJson());
-                                        } else {
-                                          this.absentees.add(new StudentDetails(
-                                                  f.rollNum, f.name)
-                                              .toJson());
-                                        }
-                                      });
-                                      setState(() {
-                                        this.courseAttendance.presentees =
-                                            this.presentees;
-                                        this.courseAttendance.absentees =
-                                            this.absentees;
-                                      });
-                                      postFirebaseAttendance(
-                                          this.courseAttendance);
-                                    },
-                                    color: Colors.teal,
-                                    textColor: Colors.white),
-                              )
-                            ])))));
+                                                              .present,
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              this
+                                                                  .displayList[
+                                                                      index]
+                                                                  .present = value;
+                                                            });
+                                                          }),
+                                                    )));
+                                          })),
+                                  Padding(
+                                    padding: EdgeInsets.all(10),
+                                    child: RaisedButton(
+                                        child: Text("Post Attendance"),
+                                        onPressed: () {
+                                          this.presentees.clear();
+                                          this.absentees.clear();
+                                          this.displayList.forEach((f) {
+                                            if (f.present == true) {
+                                              this.presentees.add(
+                                                  new StudentDetails(
+                                                          f.rollNum, f.name)
+                                                      .toJson());
+                                            } else {
+                                              this.absentees.add(
+                                                  new StudentDetails(
+                                                          f.rollNum, f.name)
+                                                      .toJson());
+                                            }
+                                          });
+                                          setState(() {
+                                            this.courseAttendance.presentees =
+                                                this.presentees;
+                                            this.courseAttendance.absentees =
+                                                this.absentees;
+                                          });
+                                          postFirebaseAttendance(
+                                              this.courseAttendance);
+                                        },
+                                        color: Colors.teal,
+                                        textColor: Colors.white),
+                                  )
+                                ])))));
   }
 
   Future<bool> _onBackPressed() {
