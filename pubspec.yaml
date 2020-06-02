@@ -43,6 +43,7 @@ dependencies:
   spreadsheet_decoder: ^1.1.0
   grouped_buttons: ^1.0.4
 
+  intl: ^0.16.1
  
 
   cupertino_icons: ^0.1.2

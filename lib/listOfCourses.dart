@@ -424,6 +424,10 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                                                     .courseName
                                                                     .toString()
                                                                     .toLowerCase(),
+                                                                "year": items
+                                                                    .elementAt(
+                                                                        index)
+                                                                    .year,
                                                                 "route":
                                                                     "listOfCourses"
                                                               });

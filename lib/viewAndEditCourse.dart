@@ -1,11 +1,17 @@
 import 'dart:collection';
+import 'dart:io';
+import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/courseDetails.dart';
+import 'package:attendance/DataModels/studentDetails.dart';
+import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
+import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ViewAndEditCourse extends StatefulWidget {
@@ -16,7 +22,7 @@ class ViewAndEditCourse extends StatefulWidget {
 
 class ViewAndEditCourseState extends State<ViewAndEditCourse> {
   CourseDetails courseDetails;
-  String courseName;
+  String courseName, year;
   final fb = FirebaseDatabase.instance;
 
   Future<void> _launched;
@@ -35,11 +41,20 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
   List<Widget> contactWidget;
   LinkedHashSet phones;
 
+  //File utils
+  String fileType = "xlsx";
+  File file;
+  LinkedHashSet students;
+  List studentDetails;
+
   @override
   void initState() {
     super.initState();
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
+    this.studentDetails = [];
+    grantStoragePermissionAndCreateDir(context);
+    this.students = new LinkedHashSet<StudentDetails>();
     this.phone = [];
     print(widget.args);
     if (widget.args != null) {
@@ -52,10 +67,14 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
             this.courseName = widget.args["courseName"];
             getData(this.courseName);
           }
+          if (widget.args["year"] != null) {
+            this.year = widget.args["year"];
+          }
         } else if (widget.args["route"] == "contacts") {
           Contact contact = widget.args["contact"];
           this.courseDetails = widget.args["courseDetails"];
           this.courseName = this.courseDetails.courseName;
+          this.year = this.courseDetails.year;
           facultyNameController.text = widget.args["trainerName"];
           venueController.text = widget.args["venue"];
           this.update = widget.args["update"];
@@ -117,6 +136,8 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     ref.child("Courses").child(id).once().then((DataSnapshot data) {
       setState(() {
         this.courseDetails = CourseDetails.fromSnapshot(data);
+        this.courseName = this.courseDetails.courseName;
+        this.year = this.courseDetails.year;
       });
     });
   }
@@ -131,13 +152,37 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
           .set(courseDetails.toJson());
       Fluttertoast.showToast(
           msg:
-              courseDetails.courseName.toUpperCase() + " Updated Successfully!",
+              courseDetails.courseName.toLowerCase() + " Updated Successfully!",
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.green,
           textColor: Colors.white);
       Navigator.of(context).pushReplacementNamed("courseDetails", arguments: {
         "courseName": courseDetails.courseName,
         "route": "listOfCourses"
+      });
+    } on PlatformException catch (e) {
+      print("Oops! " + e.toString());
+    }
+  }
+
+  postFirebaseCourseAttendance(CourseAttendance courseAttendance) {
+    print(courseAttendance.courseName);
+    final ref = fb.reference();
+    try {
+      ref
+          .child("CourseAttendance")
+          .child(courseAttendance.courseName)
+          .set(courseAttendance.toJson());
+      Fluttertoast.showToast(
+          msg: courseDetails.courseName.toLowerCase() +
+              "Excel Added Successfully!",
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.green,
+          textColor: Colors.white);
+      Navigator.of(context).pushReplacementNamed("courseDetails", arguments: {
+        "courseName": courseDetails.courseName,
+        "route": "listOfCourses",
+        "year": courseDetails.year,
       });
     } on PlatformException catch (e) {
       print("Oops! " + e.toString());
@@ -423,7 +468,107 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                                         "manageCordinators",
                                         arguments: {
                                           "route": "courseDetails",
-                                          "courseName": this.courseName
+                                          "courseName": this.courseName,
+                                          "year": this.year,
+                                        });
+                                  }),
+                            )),
+                        Card(
+                            elevation: 5,
+                            child: ListTile(
+                              title: Text(
+                                "Upload Excel Sheet",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.cloud_upload,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () {
+                                    filePicker(
+                                        context, this.courseName, this.year);
+                                  }),
+                            )),
+                        Card(
+                            elevation: 5,
+                            child: ListTile(
+                              title: Text(
+                                "Post Attendance",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.group,
+                                    color: Colors.teal,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                        "postAttendance",
+                                        arguments: {
+                                          "route": "courseDetails",
+                                          "courseName": this.courseName,
+                                          "year": this.year,
+                                        });
+                                  }),
+                            )),
+                        Card(
+                            elevation: 5,
+                            child: ListTile(
+                              title: Text(
+                                "Show Present Attendance",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.person_outline,
+                                    color: Colors.green,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                        "showAttendance",
+                                        arguments: {
+                                          "route": "courseDetails",
+                                          "courseName": this.courseName,
+                                          "what": "present"
+                                        });
+                                  }),
+                            )),
+                        Card(
+                            elevation: 5,
+                            child: ListTile(
+                              title: Text(
+                                "Show Absent Attendance",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.person_outline,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                        "showAttendance",
+                                        arguments: {
+                                          "route": "courseDetails",
+                                          "courseName": this.courseName,
+                                          "what": "absent"
                                         });
                                   }),
                             ))
@@ -506,5 +651,75 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         ],
       ),
     );
+  }
+
+  Future filePicker(
+      BuildContext context, String courseName, String year) async {
+    try {
+      if (fileType == 'xlsx') {
+        file = await FilePicker.getFile(
+            type: FileType.custom, allowedExtensions: ['xlsx']);
+        if (file != null) {
+          print(file);
+          var bytes = file.readAsBytesSync();
+          var decoder = SpreadsheetDecoder.decodeBytes(bytes);
+          print(decoder.tables.keys);
+          if (decoder.tables.keys.contains(this.courseName)) {
+            var table = decoder.tables[this.courseName];
+            var j;
+            for (var i = 0; i < table.maxRows; i++) {
+              if (table.rows[i].contains("Name of the Student")) {
+                j = i + 1;
+              }
+            }
+            for (var i = j; i < table.maxRows; i++) {
+              setState(() {
+                this.students.add(
+                    new StudentDetails(table.rows[i][2], table.rows[i][1]));
+              });
+            }
+            print(this.students.length);
+            this.students.forEach((f) {
+              this.studentDetails.add(f.toJson());
+            });
+            print(this.studentDetails.length);
+            CourseAttendance courseAttendance = new CourseAttendance(
+                this.courseName, this.year, this.studentDetails, null, null);
+            postFirebaseCourseAttendance(courseAttendance);
+            this.studentDetails.clear();
+            this.students.clear();
+          } else {
+            Fluttertoast.showToast(
+                msg: "Couldn't found " + this.courseName + " in Excel Sheet",
+                toastLength: Toast.LENGTH_LONG,
+                backgroundColor: Colors.green,
+                textColor: Colors.white);
+          }
+        } else {
+          Fluttertoast.showToast(
+              msg: "UnSuccessful Upload!\nTry Again.",
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.green,
+              textColor: Colors.white);
+        }
+      }
+    } on PlatformException catch (e) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Sorry...'),
+              content: Text('Unsupported exception: $e'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    }
   }
 }

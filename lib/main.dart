@@ -3,6 +3,8 @@ import 'package:attendance/contacts.dart';
 import 'package:attendance/home.dart';
 import 'package:attendance/manageAdmins.dart';
 import 'package:attendance/manageCourseCoordinators.dart';
+import 'package:attendance/postAttendance.dart';
+import 'package:attendance/showAttendance.dart';
 import 'package:attendance/viewAndEditCourse.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +43,10 @@ class MyApp extends StatelessWidget {
                 ViewAndEditCourse(ModalRoute.of(context).settings.arguments),
             "manageCordinators": (context) =>
                 ManageCordinators(ModalRoute.of(context).settings.arguments),
+            "postAttendance": (context) =>
+                PostAttendance(ModalRoute.of(context).settings.arguments),
+            "showAttendance": (context) =>
+                ShowAttendance(ModalRoute.of(context).settings.arguments),
           },
         ));
   }
