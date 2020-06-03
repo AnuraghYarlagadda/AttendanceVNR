@@ -56,6 +56,11 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
       });
       print(this.courses.length);
     });
+    if (this.items.length == 0 && courseDetails == null) {
+      setState(() {
+        this._status = Status.loaded.index;
+      });
+    }
     ref.onChildChanged.listen((onData) {
       courseDetails = CourseDetails.fromSnapshot(onData.snapshot);
       setState(() {
@@ -105,7 +110,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
     ref.child("TimeStamp").child(courseName).remove();
     List keys = [];
     await ref.child("CourseCoordinators").once().then((data) {
-      keys.addAll(data.value.keys);
+      if (data.value != null) keys.addAll(data.value.keys);
     });
     keys.forEach((f) async {
       await ref.child("CourseCoordinators").child(f).once().then((data) {
@@ -502,13 +507,13 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
             color: Colors.red, fontSize: 15, fontWeight: FontWeight.bold),
       ),
       onPressed: () async {
+        Navigator.of(context).pop(); // dismiss dialog
         await delFirebase(courseName.toLowerCase());
         Fluttertoast.showToast(
             msg: courseName + " Deleted!",
             toastLength: Toast.LENGTH_SHORT,
             backgroundColor: Colors.red,
             textColor: Colors.white);
-        Navigator.of(context).pop(); // dismiss dialog
       },
     );
 

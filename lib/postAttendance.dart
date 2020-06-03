@@ -16,7 +16,7 @@ class PostAttendance extends StatefulWidget {
   PostAttendanceState createState() => PostAttendanceState();
 }
 
-enum Status { loading, loaded }
+enum Status { data, nodata }
 
 class PostAttendanceState extends State<PostAttendance> {
   final fb = FirebaseDatabase.instance;
@@ -26,10 +26,13 @@ class PostAttendanceState extends State<PostAttendance> {
   LinkedHashSet display;
   var total, presentees, absentees, displayList;
 
+  int status;
+
   @override
   void initState() {
     super.initState();
     print(widget.args);
+    this.status = Status.data.index;
     this.total = new List();
     this.presentees = new List();
     this.absentees = new List();
@@ -45,64 +48,85 @@ class PostAttendanceState extends State<PostAttendance> {
   }
 
   getData() async {
-    final ref = fb.reference().child("CourseAttendance").child(this.courseName);
-    await ref.once().then((data) {
-      this.courseAttendance = CourseAttendance.fromSnapshot(data);
-      if (this.courseAttendance.students != null)
-        this.total.addAll(this.courseAttendance.students);
-      if (this.courseAttendance.presentees != null)
-        this.presentees.addAll(this.courseAttendance.presentees);
-      if (this.courseAttendance.absentees != null)
-        this.absentees.addAll(this.courseAttendance.absentees);
-    });
-    if (this.presentees == null && this.absentees == null) {
-      this.total.forEach((f) {
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], false));
-      });
-    } else if (this.presentees == null && this.absentees != null) {
-      this.total.forEach((f) {
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], true));
-      });
-      this.absentees.forEach((f) {
-        this.display.removeWhere((item) => item.rollNum == f["rollNum"]);
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], false));
-      });
-    } else if (this.presentees != null && this.absentees == null) {
-      this.total.forEach((f) {
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], false));
-      });
-      this.presentees.forEach((f) {
-        this.display.removeWhere((item) => item.rollNum == f["rollNum"]);
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], true));
-      });
-    } else if (this.presentees != null && this.absentees != null) {
-      this.total.forEach((f) {
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], false));
-      });
-      this.presentees.forEach((f) {
-        this.display.removeWhere((item) => item.rollNum == f["rollNum"]);
-        this
-            .display
-            .add(new StudentAttendanceDetails(f["rollNum"], f["name"], true));
-      });
-    }
-    setState(() {
-      this.displayList.addAll(this.display.toList());
-      this.displayList
-        ..sort((StudentAttendanceDetails a, StudentAttendanceDetails b) =>
-            a.rollNum.toUpperCase().compareTo(b.rollNum.toUpperCase()));
+    final ref = fb.reference().child("CourseAttendance");
+    await ref.once().then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+        setState(() {
+          this.status = Status.nodata.index;
+        });
+      } else {
+        ref.child(this.courseName).once().then((data) {
+          print(data);
+          if (data.value == null) {
+            setState(() {
+              this.status = Status.nodata.index;
+            });
+          } else {
+            setState(() {
+              this.status = Status.data.index;
+              this.courseAttendance = CourseAttendance.fromSnapshot(data);
+              if (this.courseAttendance.students != null)
+                this.total.addAll(this.courseAttendance.students);
+              if (this.courseAttendance.presentees != null)
+                this.presentees.addAll(this.courseAttendance.presentees);
+              if (this.courseAttendance.absentees != null)
+                this.absentees.addAll(this.courseAttendance.absentees);
+            });
+            setState(() {
+              if (this.presentees == null && this.absentees == null) {
+                this.total.forEach((f) {
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], false));
+                });
+              } else if (this.presentees == null && this.absentees != null) {
+                this.total.forEach((f) {
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], true));
+                });
+                this.absentees.forEach((f) {
+                  this
+                      .display
+                      .removeWhere((item) => item.rollNum == f["rollNum"]);
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], false));
+                });
+              } else if (this.presentees != null && this.absentees == null) {
+                this.total.forEach((f) {
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], false));
+                });
+                this.presentees.forEach((f) {
+                  this
+                      .display
+                      .removeWhere((item) => item.rollNum == f["rollNum"]);
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], true));
+                });
+              } else if (this.presentees != null && this.absentees != null) {
+                this.total.forEach((f) {
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], false));
+                });
+                this.presentees.forEach((f) {
+                  this
+                      .display
+                      .removeWhere((item) => item.rollNum == f["rollNum"]);
+                  this.display.add(new StudentAttendanceDetails(
+                      f["rollNum"], f["name"], true));
+                });
+              }
+            });
+            setState(() {
+              this.displayList.addAll(this.display.toList());
+              this.displayList
+                ..sort((StudentAttendanceDetails a,
+                        StudentAttendanceDetails b) =>
+                    a.rollNum.toUpperCase().compareTo(b.rollNum.toUpperCase()));
+            });
+          }
+        });
+      }
     });
   }
 
@@ -192,12 +216,13 @@ class PostAttendanceState extends State<PostAttendance> {
                     ],
                   );
                 },
-                child: this.displayList.length == 0
+                child: (this.displayList.length == 0 &&
+                        this.status == Status.data.index)
                     ? Center(
                         child: SpinKitWave(
                             color: Colors.blue, type: SpinKitWaveType.start))
                     : (this.displayList.length == 0 &&
-                            this.courseAttendance.students == null)
+                            this.status == Status.nodata.index)
                         ? Center(
                             child:
                                 Text("EXCEL Sheet wasn't Added to the course!"))

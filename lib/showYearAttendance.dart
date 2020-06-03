@@ -56,7 +56,7 @@ class YearAttendanceState extends State<YearAttendance> {
     final ref = fb.reference();
     List keys = [];
     await ref.child("CourseAttendance").once().then((onValue) {
-      keys.addAll(onValue.value.keys);
+      if (onValue.value != null) keys.addAll(onValue.value.keys);
     });
     for (String key in keys) {
       await ref.child("CourseAttendance").child(key).once().then((data) {
@@ -117,7 +117,7 @@ class YearAttendanceState extends State<YearAttendance> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text("Courses"),
+          title: Text("Year Report"),
         ),
         body: OfflineBuilder(
           connectivityBuilder: (

@@ -663,12 +663,16 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
           print(file);
           var bytes = file.readAsBytesSync();
           var decoder = SpreadsheetDecoder.decodeBytes(bytes);
+          decoder.tables.keys.forEach((f) {
+            f = f.toString().toLowerCase();
+          });
           print(decoder.tables.keys);
           if (decoder.tables.keys.contains(this.courseName.toLowerCase())) {
             var table = decoder.tables[this.courseName.toLowerCase()];
             var j;
             for (var i = 0; i < table.maxRows; i++) {
-              if (table.rows[i].contains("Name of the Student".toLowerCase())) {
+              if ((table.rows[i].toString().toLowerCase())
+                  .contains("Name of the Student".toLowerCase())) {
                 j = i + 1;
               }
             }

@@ -13,11 +13,13 @@ class ShowAttendance extends StatefulWidget {
   ShowAttendanceState createState() => ShowAttendanceState();
 }
 
+enum Status { data, nodata }
+
 class ShowAttendanceState extends State<ShowAttendance> {
   String courseName, what, timeStamp;
   CourseAttendance courseAttendance;
   final fb = FirebaseDatabase.instance;
-
+  int status;
   var display, displayList;
 
   //PDF Utils
@@ -29,6 +31,7 @@ class ShowAttendanceState extends State<ShowAttendance> {
     super.initState();
     print(widget.args);
     grantStoragePermissionAndCreateDir(context);
+    this.status = Status.data.index;
     this.timeStamp = "";
     this.display = new List();
     this.displayList = new List<StudentDetails>();
@@ -43,34 +46,70 @@ class ShowAttendanceState extends State<ShowAttendance> {
 
   getData() async {
     final ref = fb.reference();
-    await ref
-        .child("CourseAttendance")
-        .child(this.courseName)
-        .once()
-        .then((data) {
-      setState(() {
-        this.courseAttendance = CourseAttendance.fromSnapshot(data);
-        if (this.what == "present") {
-          if (this.courseAttendance.presentees != null)
-            this.display.addAll(this.courseAttendance.presentees);
-        } else if (this.what == "absent") {
-          if (this.courseAttendance.absentees != null)
-            this.display.addAll(this.courseAttendance.absentees);
-        }
-      });
+    await ref.child("CourseAttendance").once().then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+        setState(() {
+          this.status = Status.nodata.index;
+        });
+      } else {
+        ref
+            .child("CourseAttendance")
+            .child(this.courseName)
+            .once()
+            .then((data) {
+          print(data);
+          if (data.value == null) {
+            setState(() {
+              this.status = Status.nodata.index;
+            });
+          } else {
+            setState(() {
+              this.status = Status.data.index;
+              this.courseAttendance = CourseAttendance.fromSnapshot(data);
+              if (this.what == "present") {
+                if (this.courseAttendance.presentees != null)
+                  this.display.addAll(this.courseAttendance.presentees);
+              } else if (this.what == "absent") {
+                if (this.courseAttendance.absentees != null)
+                  this.display.addAll(this.courseAttendance.absentees);
+              }
+              setState(() {
+                this.display.forEach((f) {
+                  this
+                      .displayList
+                      .add(new StudentDetails(f["rollNum"], f["name"]));
+                });
+                this.displayList
+                  ..sort((StudentDetails a, StudentDetails b) => a.rollNum
+                      .toUpperCase()
+                      .compareTo(b.rollNum.toUpperCase()));
+              });
+            });
+          }
+        });
+      }
     });
-    await ref.child("TimeStamp").child(this.courseName).once().then((onValue) {
-      setState(() {
-        this.timeStamp = onValue.value;
-      });
-    });
-    setState(() {
-      this.display.forEach((f) {
-        this.displayList.add(new StudentDetails(f["rollNum"], f["name"]));
-      });
-      this.displayList
-        ..sort((StudentDetails a, StudentDetails b) =>
-            a.rollNum.toUpperCase().compareTo(b.rollNum.toUpperCase()));
+    await ref.child("TimeStamp").once().then((onValue) {
+      print(onValue.value);
+      if (onValue.value == null) {
+        setState(() {
+          this.status = Status.nodata.index;
+        });
+      } else {
+        ref.child("TimeStamp").child(this.courseName).once().then((onValue) {
+          if (onValue.value == null) {
+            setState(() {
+              this.status = Status.nodata.index;
+            });
+          } else {
+            setState(() {
+              this.status = Status.data.index;
+              this.timeStamp = onValue.value;
+            });
+          }
+        });
+      }
     });
     genList();
     print(this.displayList.length);
@@ -82,89 +121,98 @@ class ShowAttendanceState extends State<ShowAttendance> {
       appBar: AppBar(
         title: Text("Attendance"),
       ),
-      body: (this.courseAttendance == null || this.timeStamp.length == 0)
+      body: (this.displayList.length == 0 &&
+              this.status == Status.data.index &&
+              this.timeStamp.length == 0)
           ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
-                    child: ListTile(
-                      isThreeLine: true,
-                      title: Text(
-                        this.courseAttendance.courseName.toUpperCase(),
-                        style: TextStyle(
-                            color: Colors.indigo,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      subtitle: Text(
-                        "Last Posted on: " +
-                            this.timeStamp +
-                            "\n" +
-                            this.what.toUpperCase() +
-                            " Details",
-                        style: TextStyle(
-                          color: Colors.deepOrange[900],
-                          fontWeight: FontWeight.w400,
+          : (this.courseAttendance == null &&
+                  this.displayList.length == 0 &&
+                  this.status == Status.nodata.index)
+              ? Center(child: Text("EXCEL Sheet wasn't Added to the course!"))
+              : SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
+                        child: ListTile(
+                          isThreeLine: true,
+                          title: Text(
+                            this.courseAttendance.courseName.toUpperCase(),
+                            style: TextStyle(
+                                color: Colors.indigo,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          subtitle: Text(
+                            "Last Posted on: " +
+                                this.timeStamp +
+                                "\n" +
+                                this.what.toUpperCase() +
+                                " Details",
+                            style: TextStyle(
+                              color: Colors.deepOrange[900],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      this.displayList.length == 0
+                          ? Center(child: Text("No Data"))
+                          : Scrollbar(
+                              child: ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: this.displayList.length,
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                        child: Card(
+                                            elevation: 5,
+                                            child: ListTile(
+                                              leading: Text(
+                                                (index + 1).toString(),
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15,
+                                                    fontStyle: FontStyle.normal,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              title: Text(
+                                                this.displayList[index].rollNum,
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15,
+                                                    fontStyle: FontStyle.italic,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              subtitle: Text(
+                                                this.displayList[index].name,
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 12,
+                                                    fontStyle: FontStyle.italic,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            )));
+                                  })),
+                      Padding(
+                        padding: EdgeInsets.all(10),
+                        child: RaisedButton(
+                            child: Text("Generate Report"),
+                            onPressed: () async {
+                              await generateExampleDocument();
+                            },
+                            color: Colors.teal,
+                            textColor: Colors.white),
+                      )
+                    ],
                   ),
-                  this.displayList.length == 0
-                      ? Center(child: Text("No Data"))
-                      : Scrollbar(
-                          child: ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: this.displayList.length,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                    child: Card(
-                                        elevation: 5,
-                                        child: ListTile(
-                                          leading: Text(
-                                            (index + 1).toString(),
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 15,
-                                                fontStyle: FontStyle.normal,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          title: Text(
-                                            this.displayList[index].rollNum,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 15,
-                                                fontStyle: FontStyle.italic,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          subtitle: Text(
-                                            this.displayList[index].name,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 12,
-                                                fontStyle: FontStyle.italic,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        )));
-                              })),
-                  Padding(
-                    padding: EdgeInsets.all(10),
-                    child: RaisedButton(
-                        child: Text("Generate Report"),
-                        onPressed: () async {
-                          await generateExampleDocument();
-                        },
-                        color: Colors.teal,
-                        textColor: Colors.white),
-                  )
-                ],
-              ),
-            ),
+                ),
     );
   }
 
