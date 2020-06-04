@@ -459,7 +459,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Manage Course Co-Ordinators",
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.roboto(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -486,7 +486,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Upload Excel Sheet",
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.roboto(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -508,7 +508,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Post Attendance",
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.roboto(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -535,7 +535,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Show Present Attendance",
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.roboto(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -562,7 +562,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Show Absent Attendance",
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.roboto(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,

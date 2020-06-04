@@ -251,38 +251,32 @@ class YearAttendanceState extends State<YearAttendance> {
                                   shrinkWrap: true,
                                   itemCount: this.resultList.length,
                                   itemBuilder: (context, index) {
-                                    return Container(
-                                        child: Card(
-                                            elevation: 5,
-                                            child: ListTile(
-                                              leading: Text(
-                                                (index + 1).toString(),
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 15,
-                                                    fontStyle: FontStyle.normal,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              title: Text(
-                                                this.resultList[index].rollNum,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 15,
-                                                    fontStyle: FontStyle.italic,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              subtitle: Text(
-                                                this.resultList[index].name,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12,
-                                                    fontStyle: FontStyle.italic,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            )));
+                                    return ListTile(
+                                      leading: Text(
+                                        (index + 1).toString() + ".",
+                                        style: GoogleFonts.nanumGothic(
+                                            textStyle: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600)),
+                                      ),
+                                      title: Text(
+                                          this.resultList[index].rollNum,
+                                          style: GoogleFonts.ptSansNarrow(
+                                              textStyle: TextStyle(
+                                                  fontSize: 17,
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.bold))),
+                                      subtitle: Text(
+                                        this.resultList[index].name,
+                                        style: GoogleFonts.lora(
+                                            textStyle: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.blueGrey,
+                                                fontWeight: FontWeight.w600)),
+                                      ),
+                                    );
                                   })),
                       Padding(
                         padding: EdgeInsets.all(10),

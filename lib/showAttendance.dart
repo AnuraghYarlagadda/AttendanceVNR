@@ -262,8 +262,8 @@ class ShowAttendanceState extends State<ShowAttendance> {
       </head>
       <body>
       <img src="https://img.techpowerup.org/200530/logo-new-1-converted-1.png" width="1100" height="300" alt="web-img">
-        
-        <h1 style='text-align:center;color:DodgerBlue;font-size:30px'>${this.courseName.toUpperCase()}</h1>
+        <h1 style='text-align:center;color:Crimson;font-size:30px;font-family:Almendra;'>${this.courseName.toUpperCase()}</h1>
+        <br />
         <table style="width:100%">
         <thead>
         <tr>
