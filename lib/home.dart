@@ -495,20 +495,27 @@ class HomeState extends State<Home> {
                                       ])))
                           : NoAccess()
           : this._children[this._currentIndex],
-      bottomNavigationBar: FancyBottomNavigation(
-        onTabChangedListener: (position) {
-          setState(() {
-            this._currentIndex = position;
-          });
-        },
-        tabs: [
-          TabData(iconData: Icons.home, title: "Home"),
-          TabData(iconData: Icons.dashboard, title: "Dashboard"),
-          TabData(iconData: Icons.group, title: "Team")
-        ],
-        inactiveIconColor: Colors.blueGrey,
-        textColor: Colors.blueGrey,
-      ),
+      bottomNavigationBar: (this.userLoggedIn != false &&
+              this
+                      .currentAdmins
+                      .where((item) => item.email == this.userEmail)
+                      .length >
+                  0)
+          ? FancyBottomNavigation(
+              onTabChangedListener: (position) {
+                setState(() {
+                  this._currentIndex = position;
+                });
+              },
+              tabs: [
+                TabData(iconData: Icons.home, title: "Home"),
+                TabData(iconData: Icons.dashboard, title: "Dashboard"),
+                TabData(iconData: Icons.group, title: "Team")
+              ],
+              inactiveIconColor: Colors.blueGrey,
+              textColor: Colors.blueGrey,
+            )
+          : Padding(padding: EdgeInsets.all(0)),
     );
   }
 }
