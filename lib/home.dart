@@ -3,7 +3,10 @@ import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:attendance/Utils/login.dart';
 import 'package:attendance/Utils/restrictUser.dart';
 import 'package:attendance/Utils/signin.dart';
+import 'package:attendance/dashboard.dart';
+import 'package:attendance/team.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -23,6 +26,9 @@ class Home extends StatefulWidget {
 enum Status { start, running, completed }
 
 class HomeState extends State<Home> {
+  int _currentIndex = 0;
+  final List<Widget> _children = [Home(), DashBoard(), Team()];
+
   bool userLoggedIn;
   FirebaseUser user;
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -126,342 +132,383 @@ class HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Home",
-              style: GoogleFonts.acme(
-                textStyle: TextStyle(),
-              )),
-          leading: Icon(Icons.home),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: handleClick,
-              itemBuilder: (BuildContext context) {
-                return ['Sign-Out'].map((String choice) {
-                  return PopupMenuItem<String>(
-                    enabled: this.userLoggedIn,
-                    height: MediaQuery.of(context).size.height / 18,
-                    value: choice,
-                    child: Text(choice,
-                        style: GoogleFonts.slabo27px(
-                          textStyle: TextStyle(fontSize: 15),
-                        )),
-                  );
-                }).toList();
-              },
-            ),
-          ],
-        ),
-        body: this.userLoggedIn == null
-            ? Center(
-                child: SpinKitFadingCube(color: Colors.cyan),
-              )
-            : this.userLoggedIn == false
-                ? Login()
-                : this.user == null
-                    ? Center(
-                        child: SpinKitFadingCube(color: Colors.cyan),
-                      )
-                    : this
-                                .currentAdmins
-                                .where((item) => item.email == this.userEmail)
-                                .length >
-                            0
-                        ? SingleChildScrollView(
-                            child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: <Widget>[
-                                      this
-                                              .defaultAdmins
-                                              .contains(this.userEmail)
-                                          ? ListTile(
-                                              title: Text("Manage Admins",
-                                                  style: GoogleFonts.nunito(
-                                                      textStyle: TextStyle(
-                                                          fontSize: 20,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontStyle: FontStyle
-                                                              .normal))),
-                                              trailing: IconButton(
-                                                  icon: Icon(
-                                                    Icons.settings,
-                                                    size: 25,
-                                                    color: Colors.red,
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.of(context)
-                                                        .pushNamed(
-                                                            "manageAdmins");
-                                                  }))
-                                          : Padding(
-                                              padding: EdgeInsets.all(0),
+      appBar: this._currentIndex == 0
+          ? AppBar(
+              title: Text("Home",
+                  style: GoogleFonts.acme(
+                    textStyle: TextStyle(),
+                  )),
+              leading: Icon(Icons.home),
+              actions: <Widget>[
+                PopupMenuButton<String>(
+                  onSelected: handleClick,
+                  itemBuilder: (BuildContext context) {
+                    return ['Sign-Out'].map((String choice) {
+                      return PopupMenuItem<String>(
+                        enabled: this.userLoggedIn,
+                        height: MediaQuery.of(context).size.height / 18,
+                        value: choice,
+                        child: Text(choice,
+                            style: GoogleFonts.slabo27px(
+                              textStyle: TextStyle(fontSize: 15),
+                            )),
+                      );
+                    }).toList();
+                  },
+                ),
+              ],
+            )
+          : this._currentIndex == 1
+              ? AppBar(
+                  title: Text("DashBoard",
+                      style: GoogleFonts.acme(
+                        textStyle: TextStyle(),
+                      )),
+                  leading: Icon(Icons.dashboard),
+                )
+              : AppBar(
+                  title: Text("Team",
+                      style: GoogleFonts.acme(
+                        textStyle: TextStyle(),
+                      )),
+                  leading: Icon(Icons.group)),
+      body: this._currentIndex == 0
+          ? this.userLoggedIn == null
+              ? Center(
+                  child: SpinKitFadingCube(color: Colors.cyan),
+                )
+              : this.userLoggedIn == false
+                  ? Login()
+                  : this.user == null
+                      ? Center(
+                          child: SpinKitFadingCube(color: Colors.cyan),
+                        )
+                      : this
+                                  .currentAdmins
+                                  .where((item) => item.email == this.userEmail)
+                                  .length >
+                              0
+                          ? SingleChildScrollView(
+                              child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        this
+                                                .defaultAdmins
+                                                .contains(this.userEmail)
+                                            ? ListTile(
+                                                title: Text("Manage Admins",
+                                                    style: GoogleFonts.nunito(
+                                                        textStyle: TextStyle(
+                                                            fontSize: 20,
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontStyle: FontStyle
+                                                                .normal))),
+                                                trailing: IconButton(
+                                                    icon: Icon(
+                                                      Icons.settings,
+                                                      size: 25,
+                                                      color: Colors.red,
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "manageAdmins");
+                                                    }))
+                                            : Padding(
+                                                padding: EdgeInsets.all(0),
+                                              ),
+                                        this
+                                                .defaultAdmins
+                                                .contains(this.userEmail)
+                                            ? new Divider(
+                                                height: 2.0,
+                                                thickness: 2.5,
+                                              )
+                                            : Padding(
+                                                padding: EdgeInsets.all(0),
+                                              ),
+                                        ListTile(
+                                            title: Text(
+                                              "Add Course",
+                                              style: GoogleFonts.nunito(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal)),
                                             ),
-                                      this
-                                              .defaultAdmins
-                                              .contains(this.userEmail)
-                                          ? new Divider(
-                                              height: 2.0,
-                                              thickness: 2.5,
-                                            )
-                                          : Padding(
-                                              padding: EdgeInsets.all(0),
+                                            trailing: IconButton(
+                                              icon: Icon(Icons.add),
+                                              iconSize: 25,
+                                              color: Colors.green,
+                                              onPressed: () async {
+                                                await (Connectivity()
+                                                        .checkConnectivity())
+                                                    .then((onValue) {
+                                                  if (onValue ==
+                                                      ConnectivityResult.none) {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "No Active Internet Connection!",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        textColor:
+                                                            Colors.white);
+                                                    openWIFISettingsVNR();
+                                                  } else {
+                                                    if (this
+                                                            .currentAdmins
+                                                            .where((item) => (item
+                                                                        .email ==
+                                                                    this.userEmail &&
+                                                                item.permission))
+                                                            .length >
+                                                        0) {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "addCourse");
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                          msg:
+                                                              "Permission Denied ",
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          textColor:
+                                                              Colors.white);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                            )),
+                                        new Divider(
+                                          height: 2.0,
+                                          thickness: 2.5,
+                                        ),
+                                        ListTile(
+                                            title: Text(
+                                              "Courses",
+                                              style: GoogleFonts.nunito(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal)),
                                             ),
-                                      ListTile(
-                                          title: Text(
-                                            "Add Course",
-                                            style: GoogleFonts.nunito(
-                                                textStyle: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FontStyle.normal)),
-                                          ),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.add),
-                                            iconSize: 25,
-                                            color: Colors.green,
-                                            onPressed: () async {
-                                              await (Connectivity()
-                                                      .checkConnectivity())
-                                                  .then((onValue) {
-                                                if (onValue ==
-                                                    ConnectivityResult.none) {
-                                                  Fluttertoast.showToast(
-                                                      msg:
-                                                          "No Active Internet Connection!",
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      textColor: Colors.white);
-                                                  openWIFISettingsVNR();
-                                                } else {
-                                                  if (this
-                                                          .currentAdmins
-                                                          .where((item) => (item
-                                                                      .email ==
-                                                                  this.userEmail &&
-                                                              item.permission))
-                                                          .length >
-                                                      0) {
-                                                    Navigator.of(context)
-                                                        .pushNamed("addCourse");
-                                                  } else {
+                                            trailing: IconButton(
+                                              icon: Icon(Icons.remove_red_eye),
+                                              iconSize: 25,
+                                              color: Colors.blue,
+                                              onPressed: () async {
+                                                await (Connectivity()
+                                                        .checkConnectivity())
+                                                    .then((onValue) {
+                                                  if (onValue ==
+                                                      ConnectivityResult.none) {
                                                     Fluttertoast.showToast(
                                                         msg:
-                                                            "Permission Denied ",
+                                                            "No Active Internet Connection!",
                                                         toastLength:
-                                                            Toast.LENGTH_LONG,
+                                                            Toast.LENGTH_SHORT,
                                                         backgroundColor:
                                                             Colors.red,
                                                         textColor:
                                                             Colors.white);
-                                                  }
-                                                }
-                                              });
-                                            },
-                                          )),
-                                      new Divider(
-                                        height: 2.0,
-                                        thickness: 2.5,
-                                      ),
-                                      ListTile(
-                                          title: Text(
-                                            "Courses",
-                                            style: GoogleFonts.nunito(
-                                                textStyle: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FontStyle.normal)),
-                                          ),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.remove_red_eye),
-                                            iconSize: 25,
-                                            color: Colors.blue,
-                                            onPressed: () async {
-                                              await (Connectivity()
-                                                      .checkConnectivity())
-                                                  .then((onValue) {
-                                                if (onValue ==
-                                                    ConnectivityResult.none) {
-                                                  Fluttertoast.showToast(
-                                                      msg:
-                                                          "No Active Internet Connection!",
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      textColor: Colors.white);
-                                                  openWIFISettingsVNR();
-                                                } else {
-                                                  if (this
-                                                          .currentAdmins
-                                                          .where((item) => (item
-                                                                      .email ==
-                                                                  this.userEmail &&
-                                                              item.permission))
-                                                          .length >
-                                                      0) {
-                                                    Navigator.of(context)
-                                                        .pushNamed(
-                                                            "listOfCourses");
+                                                    openWIFISettingsVNR();
                                                   } else {
+                                                    if (this
+                                                            .currentAdmins
+                                                            .where((item) => (item
+                                                                        .email ==
+                                                                    this.userEmail &&
+                                                                item.permission))
+                                                            .length >
+                                                        0) {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "listOfCourses");
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                          msg:
+                                                              "Permission Denied ",
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          textColor:
+                                                              Colors.white);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                            )),
+                                        new Divider(
+                                          height: 2.0,
+                                          thickness: 2.5,
+                                        ),
+                                        ListTile(
+                                            title: Text(
+                                              "Year Report Present Attendance",
+                                              style: GoogleFonts.nunito(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal)),
+                                            ),
+                                            trailing: IconButton(
+                                              icon: Icon(Icons.person_outline),
+                                              iconSize: 25,
+                                              color: Colors.green,
+                                              onPressed: () async {
+                                                await (Connectivity()
+                                                        .checkConnectivity())
+                                                    .then((onValue) {
+                                                  if (onValue ==
+                                                      ConnectivityResult.none) {
                                                     Fluttertoast.showToast(
                                                         msg:
-                                                            "Permission Denied ",
+                                                            "No Active Internet Connection!",
                                                         toastLength:
-                                                            Toast.LENGTH_LONG,
+                                                            Toast.LENGTH_SHORT,
                                                         backgroundColor:
                                                             Colors.red,
                                                         textColor:
                                                             Colors.white);
-                                                  }
-                                                }
-                                              });
-                                            },
-                                          )),
-                                      new Divider(
-                                        height: 2.0,
-                                        thickness: 2.5,
-                                      ),
-                                      ListTile(
-                                          title: Text(
-                                            "Year Report Present Attendance",
-                                            style: GoogleFonts.nunito(
-                                                textStyle: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FontStyle.normal)),
-                                          ),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.person_outline),
-                                            iconSize: 25,
-                                            color: Colors.green,
-                                            onPressed: () async {
-                                              await (Connectivity()
-                                                      .checkConnectivity())
-                                                  .then((onValue) {
-                                                if (onValue ==
-                                                    ConnectivityResult.none) {
-                                                  Fluttertoast.showToast(
-                                                      msg:
-                                                          "No Active Internet Connection!",
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      textColor: Colors.white);
-                                                  openWIFISettingsVNR();
-                                                } else {
-                                                  if (this
-                                                          .currentAdmins
-                                                          .where((item) => (item
-                                                                      .email ==
-                                                                  this.userEmail &&
-                                                              item.permission))
-                                                          .length >
-                                                      0) {
-                                                    Navigator.of(context)
-                                                        .pushNamed(
-                                                            "yearAttendance",
-                                                            arguments: {
-                                                          "what": "present"
-                                                        });
+                                                    openWIFISettingsVNR();
                                                   } else {
+                                                    if (this
+                                                            .currentAdmins
+                                                            .where((item) => (item
+                                                                        .email ==
+                                                                    this.userEmail &&
+                                                                item.permission))
+                                                            .length >
+                                                        0) {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "yearAttendance",
+                                                              arguments: {
+                                                            "what": "present"
+                                                          });
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                          msg:
+                                                              "Permission Denied ",
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          textColor:
+                                                              Colors.white);
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                            )),
+                                        new Divider(
+                                          height: 2.0,
+                                          thickness: 2.5,
+                                        ),
+                                        ListTile(
+                                            title: Text(
+                                              "Year Report Absent Attendance",
+                                              style: GoogleFonts.nunito(
+                                                  textStyle: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal)),
+                                            ),
+                                            trailing: IconButton(
+                                              icon: Icon(Icons.person_outline),
+                                              iconSize: 25,
+                                              color: Colors.red,
+                                              onPressed: () async {
+                                                await (Connectivity()
+                                                        .checkConnectivity())
+                                                    .then((onValue) {
+                                                  if (onValue ==
+                                                      ConnectivityResult.none) {
                                                     Fluttertoast.showToast(
                                                         msg:
-                                                            "Permission Denied ",
+                                                            "No Active Internet Connection!",
                                                         toastLength:
-                                                            Toast.LENGTH_LONG,
+                                                            Toast.LENGTH_SHORT,
                                                         backgroundColor:
                                                             Colors.red,
                                                         textColor:
                                                             Colors.white);
-                                                  }
-                                                }
-                                              });
-                                            },
-                                          )),
-                                      new Divider(
-                                        height: 2.0,
-                                        thickness: 2.5,
-                                      ),
-                                      ListTile(
-                                          title: Text(
-                                            "Year Report Absent Attendance",
-                                            style: GoogleFonts.nunito(
-                                                textStyle: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle:
-                                                        FontStyle.normal)),
-                                          ),
-                                          trailing: IconButton(
-                                            icon: Icon(Icons.person_outline),
-                                            iconSize: 25,
-                                            color: Colors.red,
-                                            onPressed: () async {
-                                              await (Connectivity()
-                                                      .checkConnectivity())
-                                                  .then((onValue) {
-                                                if (onValue ==
-                                                    ConnectivityResult.none) {
-                                                  Fluttertoast.showToast(
-                                                      msg:
-                                                          "No Active Internet Connection!",
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      textColor: Colors.white);
-                                                  openWIFISettingsVNR();
-                                                } else {
-                                                  if (this
-                                                          .currentAdmins
-                                                          .where((item) => (item
-                                                                      .email ==
-                                                                  this.userEmail &&
-                                                              item.permission))
-                                                          .length >
-                                                      0) {
-                                                    Navigator.of(context)
-                                                        .pushNamed(
-                                                            "yearAttendance",
-                                                            arguments: {
-                                                          "what": "absent"
-                                                        });
+                                                    openWIFISettingsVNR();
                                                   } else {
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Permission Denied ",
-                                                        toastLength:
-                                                            Toast.LENGTH_LONG,
-                                                        backgroundColor:
-                                                            Colors.red,
-                                                        textColor:
-                                                            Colors.white);
+                                                    if (this
+                                                            .currentAdmins
+                                                            .where((item) => (item
+                                                                        .email ==
+                                                                    this.userEmail &&
+                                                                item.permission))
+                                                            .length >
+                                                        0) {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "yearAttendance",
+                                                              arguments: {
+                                                            "what": "absent"
+                                                          });
+                                                    } else {
+                                                      Fluttertoast.showToast(
+                                                          msg:
+                                                              "Permission Denied ",
+                                                          toastLength:
+                                                              Toast.LENGTH_LONG,
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                          textColor:
+                                                              Colors.white);
+                                                    }
                                                   }
-                                                }
-                                              });
-                                            },
-                                          )),
-                                      new Divider(
-                                        height: 2.0,
-                                        thickness: 2.5,
-                                      ),
-                                    ])))
-                        : NoAccess());
+                                                });
+                                              },
+                                            )),
+                                        new Divider(
+                                          height: 2.0,
+                                          thickness: 2.5,
+                                        ),
+                                      ])))
+                          : NoAccess()
+          : this._children[this._currentIndex],
+      bottomNavigationBar: FancyBottomNavigation(
+        onTabChangedListener: (position) {
+          setState(() {
+            this._currentIndex = position;
+          });
+        },
+        tabs: [
+          TabData(iconData: Icons.home, title: "Home"),
+          TabData(iconData: Icons.dashboard, title: "Dashboard"),
+          TabData(iconData: Icons.group, title: "Team")
+        ],
+        inactiveIconColor: Colors.blueGrey,
+        textColor: Colors.blueGrey,
+      ),
+    );
   }
 }
