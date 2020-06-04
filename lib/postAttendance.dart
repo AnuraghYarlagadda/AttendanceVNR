@@ -8,6 +8,7 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class PostAttendance extends StatefulWidget {
@@ -162,7 +163,10 @@ class PostAttendanceState extends State<PostAttendance> {
         onWillPop: _onBackPressed,
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Attendance"),
+              title: Text(
+                "Attendance",
+                style: GoogleFonts.acme(),
+              ),
             ),
             body: OfflineBuilder(
                 connectivityBuilder: (
@@ -218,14 +222,20 @@ class PostAttendanceState extends State<PostAttendance> {
                 },
                 child: (this.displayList.length == 0 &&
                         this.status == Status.data.index)
-                    ? Center(
-                        child: SpinKitWave(
-                            color: Colors.blue, type: SpinKitWaveType.start))
+                    ? Center(child: SpinKitCircle(color: Colors.cyan))
                     : (this.displayList.length == 0 &&
                             this.status == Status.nodata.index)
                         ? Center(
-                            child:
-                                Text("EXCEL Sheet wasn't Added to the course!"))
+                            child: Text(
+                                "😕 EXCEL Sheet wasn't Added to the course yet!",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.robotoSlab(
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                    fontSize: 17,
+                                  ),
+                                )))
                         : SingleChildScrollView(
                             scrollDirection: Axis.vertical,
                             child: Column(
@@ -277,31 +287,31 @@ class PostAttendanceState extends State<PostAttendance> {
                                                     elevation: 5,
                                                     child: ListTile(
                                                       title: Text(
-                                                        this
-                                                            .displayList[index]
-                                                            .rollNum,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 15,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
+                                                          this
+                                                              .displayList[
+                                                                  index]
+                                                              .rollNum,
+                                                          style: GoogleFonts.ptSansNarrow(
+                                                              textStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700))),
                                                       subtitle: Text(
-                                                        this
-                                                            .displayList[index]
-                                                            .name,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 12,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
+                                                          this
+                                                              .displayList[
+                                                                  index]
+                                                              .name,
+                                                          style: GoogleFonts.inconsolata(
+                                                              textStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .blueGrey,
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600))),
                                                       trailing: Checkbox(
                                                           activeColor:
                                                               Colors.green,

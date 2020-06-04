@@ -8,6 +8,7 @@ import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 
 class YearAttendance extends StatefulWidget {
@@ -117,7 +118,10 @@ class YearAttendanceState extends State<YearAttendance> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text("Year Report"),
+          title: Text("Year Report",
+              style: GoogleFonts.acme(
+                textStyle: TextStyle(),
+              )),
         ),
         body: OfflineBuilder(
           connectivityBuilder: (
@@ -171,8 +175,10 @@ class YearAttendanceState extends State<YearAttendance> {
           },
           child: this._status == Status.loading.index
               ? Center(
-                  child: SpinKitWave(
-                      color: Colors.blue, type: SpinKitWaveType.start))
+                  child: SpinKitThreeBounce(
+                  size: 25,
+                  color: Colors.cyan,
+                ))
               : SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
@@ -185,10 +191,12 @@ class YearAttendanceState extends State<YearAttendance> {
                             child: ListTile(
                               subtitle: Text(
                                 'Filter Year!',
-                                style: new TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
-                                  fontSize: 15,
+                                style: GoogleFonts.lora(
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -228,7 +236,15 @@ class YearAttendanceState extends State<YearAttendance> {
                             ),
                           )),
                       this.resultList.length == 0
-                          ? Center(child: Text("😕 No Students found..!"))
+                          ? Center(
+                              child: Text("😕 No Students found..!",
+                                  style: GoogleFonts.robotoSlab(
+                                    textStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                      fontSize: 18,
+                                    ),
+                                  )))
                           : Scrollbar(
                               child: ListView.builder(
                                   physics: NeverScrollableScrollPhysics(),

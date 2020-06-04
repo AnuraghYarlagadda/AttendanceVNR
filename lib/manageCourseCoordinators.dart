@@ -5,7 +5,9 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ManageCordinators extends StatefulWidget {
@@ -298,7 +300,10 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     this.width = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Manage Coordinators"),
+          title: Text("Manage Coordinators",
+              style: GoogleFonts.acme(
+                textStyle: TextStyle(),
+              )),
           leading: Icon(Icons.group_add),
         ),
         body: OfflineBuilder(
@@ -355,11 +360,18 @@ class ManageCordinatorsState extends State<ManageCordinators> {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: <Widget>[
-                  Text(this.courseName),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(this.courseName.toUpperCase(),
+                        style: GoogleFonts.ptSerif(
+                          textStyle:
+                              TextStyle(color: Colors.black, fontSize: 20),
+                        )),
+                  ),
                   (this.coordinators == null)
                       ? Container(
                           padding: EdgeInsets.all(15),
-                          child: CircularProgressIndicator())
+                          child: SpinKitWanderingCubes(color: Colors.cyan))
                       : ListView.builder(
                           padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                           physics: NeverScrollableScrollPhysics(),

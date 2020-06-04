@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 
 enum Status { loading, loaded }
@@ -169,7 +170,10 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text("Courses"),
+          title: Text("Courses",
+              style: GoogleFonts.acme(
+                textStyle: TextStyle(),
+              )),
         ),
         body: OfflineBuilder(
           connectivityBuilder: (
@@ -224,7 +228,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
           child: this._status == Status.loading.index
               ? Center(
                   child: SpinKitWave(
-                      color: Colors.blue, type: SpinKitWaveType.start))
+                      color: Colors.cyan, type: SpinKitWaveType.center))
               : Container(
                   padding: EdgeInsets.all(5),
                   child: Column(
@@ -250,10 +254,12 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                               ),
                               subtitle: Text(
                                 'Filter Year!',
-                                style: new TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
-                                  fontSize: 15,
+                                style: GoogleFonts.lora(
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -294,7 +300,15 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                           )),
                       Expanded(
                         child: items.length == 0
-                            ? Center(child: Text("😕 No Courses found..!"))
+                            ? Center(
+                                child: Text("😕 No Courses found..!",
+                                    style: GoogleFonts.robotoSlab(
+                                      textStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red,
+                                        fontSize: 18,
+                                      ),
+                                    )))
                             : Scrollbar(
                                 child: ListView.builder(
                                   shrinkWrap: true,
@@ -305,13 +319,16 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                           elevation: 5,
                                           child: ListTile(
                                             title: Text(
-                                              '${items.elementAt(index).courseName.toUpperCase()}',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 15,
-                                                  fontStyle: FontStyle.italic,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                                                '${items.elementAt(index).courseName.toUpperCase()}',
+                                                style: GoogleFonts.headlandOne(
+                                                  textStyle: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontStyle:
+                                                          FontStyle.normal,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                )),
                                             trailing: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: <Widget>[
@@ -363,13 +380,13 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                                                       .lock ==
                                                                   true)
                                                               ? Fluttertoast.showToast(
-                                                                  msg: "Course UnLocked! " +
-                                                                      items
+                                                                  msg: items
                                                                           .elementAt(
                                                                               index)
                                                                           .courseName
                                                                           .toString()
-                                                                          .toUpperCase(),
+                                                                          .toUpperCase() +
+                                                                      " UnLocked!",
                                                                   toastLength:
                                                                       Toast
                                                                           .LENGTH_LONG,
@@ -380,13 +397,13 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                                                       Colors
                                                                           .white)
                                                               : Fluttertoast.showToast(
-                                                                  msg: "Course Locked! " +
-                                                                      items
+                                                                  msg: items
                                                                           .elementAt(
                                                                               index)
                                                                           .courseName
                                                                           .toString()
-                                                                          .toUpperCase(),
+                                                                          .toUpperCase() +
+                                                                      " Locked!",
                                                                   toastLength: Toast
                                                                       .LENGTH_LONG,
                                                                   backgroundColor:
@@ -444,7 +461,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                                 IconButton(
                                                     icon: Icon(
                                                       Icons.delete_forever,
-                                                      color: Colors.redAccent,
+                                                      color: Colors.black,
                                                     ),
                                                     onPressed: () async {
                                                       await (Connectivity()

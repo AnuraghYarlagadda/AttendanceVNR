@@ -5,7 +5,9 @@ import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ShowAttendance extends StatefulWidget {
   final LinkedHashMap args;
@@ -119,16 +121,28 @@ class ShowAttendanceState extends State<ShowAttendance> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Attendance"),
+        title: Text(
+          "Attendance",
+          style: GoogleFonts.acme(),
+        ),
       ),
       body: (this.displayList.length == 0 &&
               this.status == Status.data.index &&
               this.timeStamp.length == 0)
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: SpinKitFadingFour(color: Colors.cyan))
           : (this.courseAttendance == null &&
                   this.displayList.length == 0 &&
                   this.status == Status.nodata.index)
-              ? Center(child: Text("EXCEL Sheet wasn't Added to the course!"))
+              ? Center(
+                  child: Text("😕 EXCEL Sheet wasn't Added to the course yet!",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.robotoSlab(
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                          fontSize: 17,
+                        ),
+                      )))
               : SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
@@ -140,65 +154,68 @@ class ShowAttendanceState extends State<ShowAttendance> {
                         child: ListTile(
                           isThreeLine: true,
                           title: Text(
-                            this.courseAttendance.courseName.toUpperCase(),
-                            style: TextStyle(
-                                color: Colors.indigo,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700),
-                          ),
+                              this.courseAttendance.courseName.toUpperCase(),
+                              style: GoogleFonts.ptSerif(
+                                  textStyle: TextStyle(
+                                      color: Colors.indigo[900],
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w700))),
                           subtitle: Text(
-                            "Last Posted on: " +
-                                this.timeStamp +
-                                "\n" +
-                                this.what.toUpperCase() +
-                                " Details",
-                            style: TextStyle(
-                              color: Colors.deepOrange[900],
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                              "Last Posted on: " +
+                                  this.timeStamp +
+                                  "\n" +
+                                  this.what.toUpperCase() +
+                                  " Details",
+                              style: GoogleFonts.quicksand(
+                                  textStyle: TextStyle(
+                                      color: Colors.deepOrangeAccent[400],
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500))),
                         ),
                       ),
                       this.displayList.length == 0
-                          ? Center(child: Text("No Data"))
+                          ? Center(
+                              child: Padding(
+                              padding: EdgeInsets.all(50),
+                              child: Text(
+                                "No Data !",
+                                style: GoogleFonts.architectsDaughter(
+                                    textStyle: TextStyle(
+                                        color: Colors.black, fontSize: 18)),
+                              ),
+                            ))
                           : Scrollbar(
                               child: ListView.builder(
                                   physics: NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   itemCount: this.displayList.length,
                                   itemBuilder: (context, index) {
-                                    return Container(
-                                        child: Card(
-                                            elevation: 5,
-                                            child: ListTile(
-                                              leading: Text(
-                                                (index + 1).toString(),
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 15,
-                                                    fontStyle: FontStyle.normal,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              title: Text(
-                                                this.displayList[index].rollNum,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 15,
-                                                    fontStyle: FontStyle.italic,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              subtitle: Text(
-                                                this.displayList[index].name,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12,
-                                                    fontStyle: FontStyle.italic,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            )));
+                                    return ListTile(
+                                      leading: Text(
+                                        (index + 1).toString() + ".",
+                                        style: GoogleFonts.nanumGothic(
+                                            textStyle: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600)),
+                                      ),
+                                      title: Text(
+                                          this.displayList[index].rollNum,
+                                          style: GoogleFonts.ptSansNarrow(
+                                              textStyle: TextStyle(
+                                                  fontSize: 17,
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.bold))),
+                                      subtitle: Text(
+                                        this.displayList[index].name,
+                                        style: GoogleFonts.lora(
+                                            textStyle: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.blueGrey,
+                                                fontWeight: FontWeight.w600)),
+                                      ),
+                                    );
                                   })),
                       Padding(
                         padding: EdgeInsets.all(10),
@@ -246,7 +263,7 @@ class ShowAttendanceState extends State<ShowAttendance> {
       <body>
       <img src="https://img.techpowerup.org/200530/logo-new-1-converted-1.png" width="1100" height="300" alt="web-img">
         
-        <h1 style='text-align:center;color:red;font-size:30px'>${this.courseName.toUpperCase()}</h1>
+        <h1 style='text-align:center;color:DodgerBlue;font-size:30px'>${this.courseName.toUpperCase()}</h1>
         <table style="width:100%">
         <thead>
         <tr>

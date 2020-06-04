@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NoAccess extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class NoAccessState extends State<NoAccess> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(milliseconds: 6000), () {
       setState(() {
         this.anuragh = true;
       });
@@ -24,8 +26,14 @@ class NoAccessState extends State<NoAccess> {
     return Scaffold(
       body: Center(
         child: anuragh
-            ? Text("You've no access to view the content!")
-            : CircularProgressIndicator(),
+            ? Text("You've no access to view the content!",
+                style: GoogleFonts.anton(
+                  textStyle: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 19,
+                      color: Colors.red),
+                ))
+            : SpinKitFadingCube(color: Colors.cyan),
       ),
     );
   }

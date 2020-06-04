@@ -6,6 +6,8 @@ import 'package:attendance/Utils/signin.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -109,7 +111,7 @@ class HomeState extends State<Home> {
         Fluttertoast.showToast(
             msg: "Welcome " + this.userName,
             toastLength: Toast.LENGTH_LONG,
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.cyan,
             textColor: Colors.white);
       });
     });
@@ -125,7 +127,10 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Home"),
+          title: Text("Home",
+              style: GoogleFonts.acme(
+                textStyle: TextStyle(),
+              )),
           leading: Icon(Icons.home),
           actions: <Widget>[
             PopupMenuButton<String>(
@@ -136,11 +141,10 @@ class HomeState extends State<Home> {
                     enabled: this.userLoggedIn,
                     height: MediaQuery.of(context).size.height / 18,
                     value: choice,
-                    child: Text(
-                      choice,
-                      style:
-                          TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
-                    ),
+                    child: Text(choice,
+                        style: GoogleFonts.slabo27px(
+                          textStyle: TextStyle(fontSize: 15),
+                        )),
                   );
                 }).toList();
               },
@@ -148,11 +152,15 @@ class HomeState extends State<Home> {
           ],
         ),
         body: this.userLoggedIn == null
-            ? Center(child: CircularProgressIndicator())
+            ? Center(
+                child: SpinKitFadingCube(color: Colors.cyan),
+              )
             : this.userLoggedIn == false
                 ? Login()
                 : this.user == null
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: SpinKitFadingCube(color: Colors.cyan),
+                      )
                     : this
                                 .currentAdmins
                                 .where((item) => item.email == this.userEmail)
@@ -171,16 +179,15 @@ class HomeState extends State<Home> {
                                               .defaultAdmins
                                               .contains(this.userEmail)
                                           ? ListTile(
-                                              //isThreeLine: true,
-                                              title: Text(
-                                                "Manage Admins",
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Colors.indigo,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontStyle:
-                                                        FontStyle.normal),
-                                              ),
+                                              title: Text("Manage Admins",
+                                                  style: GoogleFonts.nunito(
+                                                      textStyle: TextStyle(
+                                                          fontSize: 20,
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontStyle: FontStyle
+                                                              .normal))),
                                               trailing: IconButton(
                                                   icon: Icon(
                                                     Icons.settings,
@@ -208,11 +215,13 @@ class HomeState extends State<Home> {
                                       ListTile(
                                           title: Text(
                                             "Add Course",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.indigo,
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle: FontStyle.normal),
+                                            style: GoogleFonts.nunito(
+                                                textStyle: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FontStyle.normal)),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.add),
@@ -266,16 +275,18 @@ class HomeState extends State<Home> {
                                       ListTile(
                                           title: Text(
                                             "Courses",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.indigo,
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle: FontStyle.normal),
+                                            style: GoogleFonts.nunito(
+                                                textStyle: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FontStyle.normal)),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.remove_red_eye),
                                             iconSize: 25,
-                                            color: Colors.orange,
+                                            color: Colors.blue,
                                             onPressed: () async {
                                               await (Connectivity()
                                                       .checkConnectivity())
@@ -324,12 +335,14 @@ class HomeState extends State<Home> {
                                       ),
                                       ListTile(
                                           title: Text(
-                                            "Year report Present Attendance",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.indigo,
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle: FontStyle.normal),
+                                            "Year Report Present Attendance",
+                                            style: GoogleFonts.nunito(
+                                                textStyle: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FontStyle.normal)),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.person_outline),
@@ -386,12 +399,14 @@ class HomeState extends State<Home> {
                                       ),
                                       ListTile(
                                           title: Text(
-                                            "Year report Absent Attendance",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.indigo,
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle: FontStyle.normal),
+                                            "Year Report Absent Attendance",
+                                            style: GoogleFonts.nunito(
+                                                textStyle: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontStyle:
+                                                        FontStyle.normal)),
                                           ),
                                           trailing: IconButton(
                                             icon: Icon(Icons.person_outline),

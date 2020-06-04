@@ -6,7 +6,9 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ManageAdmin extends StatefulWidget {
@@ -186,7 +188,10 @@ class ManageAdminState extends State<ManageAdmin> {
     this.width = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Manage Admins"),
+          title: Text("Manage Admins",
+              style: GoogleFonts.acme(
+                textStyle: TextStyle(),
+              )),
           leading: Icon(Icons.group_add),
         ),
         body: OfflineBuilder(
@@ -246,7 +251,8 @@ class ManageAdminState extends State<ManageAdmin> {
                   (this.admins == null)
                       ? Container(
                           padding: EdgeInsets.all(15),
-                          child: CircularProgressIndicator())
+                          child: SpinKitWave(
+                              color: Colors.pink, type: SpinKitWaveType.start))
                       : ListView.builder(
                           padding: EdgeInsets.fromLTRB(0, 15, 0, 0),
                           physics: NeverScrollableScrollPhysics(),

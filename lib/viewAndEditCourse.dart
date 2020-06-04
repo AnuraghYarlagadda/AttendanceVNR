@@ -9,7 +9,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -174,8 +176,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
           .child(courseAttendance.courseName)
           .set(courseAttendance.toJson());
       Fluttertoast.showToast(
-          msg: courseDetails.courseName.toLowerCase() +
-              "Excel Added Successfully!",
+          msg: courseDetails.courseName.toLowerCase() + " Excel Added!",
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.green,
           textColor: Colors.white);
@@ -195,10 +196,14 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         onWillPop: _onBackPressed,
         child: Scaffold(
           appBar: AppBar(
-            title: Text(this.courseName.toUpperCase()),
+            title: Text(this.courseName.toUpperCase(),
+                style: GoogleFonts.sourceCodePro()),
           ),
           body: this.courseDetails == null
-              ? Center(child: CircularProgressIndicator())
+              ? Center(
+                  child: SpinKitFadingCube(
+                  color: Colors.cyan,
+                ))
               : Padding(
                   padding: EdgeInsets.all(10),
                   child: SingleChildScrollView(
@@ -213,11 +218,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                               title: (this.editTrainerDetails == false)
                                   ? Text(
                                       this.courseDetails.trainerName,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontStyle: FontStyle.italic,
-                                          fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.manrope(
+                                          textStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                              fontStyle: FontStyle.normal,
+                                              fontWeight: FontWeight.w500)),
                                     )
                                   : TextField(
                                       controller: facultyNameController,
@@ -350,11 +356,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                               title: (this.editVenueDetails == false)
                                   ? Text(
                                       this.courseDetails.venue,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontStyle: FontStyle.italic,
-                                          fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.manrope(
+                                          textStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                              fontStyle: FontStyle.normal,
+                                              fontWeight: FontWeight.w500)),
                                     )
                                   : TextField(
                                       controller: venueController,
@@ -452,11 +459,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Manage Course Co-Ordinators",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.playfairDisplay(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.normal,
+                                        fontWeight: FontWeight.w600)),
                               ),
                               trailing: IconButton(
                                   icon: Icon(
@@ -478,11 +486,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Upload Excel Sheet",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.playfairDisplay(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.normal,
+                                        fontWeight: FontWeight.w600)),
                               ),
                               trailing: IconButton(
                                   icon: Icon(
@@ -499,11 +508,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Post Attendance",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.playfairDisplay(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.normal,
+                                        fontWeight: FontWeight.w600)),
                               ),
                               trailing: IconButton(
                                   icon: Icon(
@@ -525,11 +535,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Show Present Attendance",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.playfairDisplay(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.normal,
+                                        fontWeight: FontWeight.w600)),
                               ),
                               trailing: IconButton(
                                   icon: Icon(
@@ -551,11 +562,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                             child: ListTile(
                               title: Text(
                                 "Show Absent Attendance",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.bold),
+                                style: GoogleFonts.playfairDisplay(
+                                    textStyle: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontStyle: FontStyle.normal,
+                                        fontWeight: FontWeight.w600)),
                               ),
                               trailing: IconButton(
                                   icon: Icon(
