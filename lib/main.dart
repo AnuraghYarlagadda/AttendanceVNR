@@ -1,5 +1,6 @@
 import 'package:attendance/addCourse.dart';
 import 'package:attendance/contacts.dart';
+import 'package:attendance/coursesBackupList.dart';
 import 'package:attendance/home.dart';
 import 'package:attendance/manageAdmins.dart';
 import 'package:attendance/manageCourseCoordinators.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
             "addCourse": (context) =>
                 AddCourse(ModalRoute.of(context).settings.arguments),
             "listOfCourses": (context) => DisplayCoursesList(),
+            "listOfCoursesBackup": (context) => DisplayCoursesListBackup(),
             "courseDetails": (context) =>
                 ViewAndEditCourse(ModalRoute.of(context).settings.arguments),
             "manageCordinators": (context) =>

@@ -27,7 +27,6 @@ enum Status { start, running, completed }
 
 class HomeState extends State<Home> {
   int _currentIndex = 0;
-  final List<Widget> _children = [Home(), DashBoard(), Team()];
 
   bool userLoggedIn;
   FirebaseUser user;
@@ -37,7 +36,7 @@ class HomeState extends State<Home> {
   var defaultAdmins;
   final fb = FirebaseDatabase.instance;
   AdminDetails adminDetails;
-
+  List<Widget> _children = [Home(), DashBoard(""), Team()];
   @override
   void initState() {
     super.initState();
@@ -113,6 +112,7 @@ class HomeState extends State<Home> {
       setState(() {
         this.user = onValue;
         this.userEmail = onValue.email;
+        this._children[1] = DashBoard(this.userEmail);
         this.userName = onValue.displayName;
         Fluttertoast.showToast(
             msg: "Welcome " + this.userName,

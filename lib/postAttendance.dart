@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:attendance/DataModels/attendanceBackup.dart';
 import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/studentAttendanceDetails.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
@@ -51,7 +52,6 @@ class PostAttendanceState extends State<PostAttendance> {
   getData() async {
     final ref = fb.reference().child("CourseAttendance");
     await ref.once().then((onValue) {
-      print(onValue.value);
       if (onValue.value == null) {
         setState(() {
           this.status = Status.nodata.index;
@@ -151,6 +151,101 @@ class PostAttendanceState extends State<PostAttendance> {
         "courseName": courseAttendance.courseName,
         "route": "listOfCourses",
         "year": courseAttendance.year,
+      });
+    } on PlatformException catch (e) {
+      print("Oops! " + e.toString());
+    }
+  }
+
+  postBackupAttendance(CourseAttendance courseAttendance) {
+    var dateinput = new DateTime.now();
+    var dateFormatter = new DateFormat('dd-MM-yyyy');
+    var timeFormatter = new DateFormat('H:m:s');
+    var hourFormatter = new DateFormat('H');
+    var minFormatter = new DateFormat('m');
+    // int hour = int.tryParse(hourFormatter.format(dateinput)) ?? 0;
+    // int min = int.tryParse(minFormatter.format(dateinput)) ?? 0;
+    String date = dateFormatter.format(dateinput);
+    //String date = "14-06-2020";
+    String time = timeFormatter.format(dateinput);
+    PresentAbsent presentAbsent = new PresentAbsent(
+        courseAttendance.presentees, courseAttendance.absentees);
+    LinkedHashMap timemap = new LinkedHashMap<dynamic, dynamic>();
+    timemap[time] = presentAbsent.toJson();
+    TimeAttendance timeAttendance = new TimeAttendance(timemap);
+    LinkedHashMap datemap = new LinkedHashMap<dynamic, dynamic>();
+    datemap[date] = timeAttendance.toJson();
+
+    final ref = fb.reference();
+    try {
+      ref.child("Backup").once().then((onValue) {
+        if (onValue.value == null) {
+          BackupAttendance backupAttendance = new BackupAttendance(
+              courseAttendance.courseName,
+              courseAttendance.year,
+              courseAttendance.students,
+              datemap);
+          try {
+            ref
+                .child("Backup")
+                .child(backupAttendance.courseName)
+                .set(backupAttendance.toJson());
+          } on PlatformException catch (e) {
+            print("Oops! " + e.toString());
+          }
+        } else {
+          print(onValue.value.keys);
+          if (onValue.value.keys.contains(courseAttendance.courseName)) {
+            try {
+              ref
+                  .child("Backup")
+                  .child(courseAttendance.courseName)
+                  .child("dates")
+                  .once()
+                  .then((onValue) {
+                LinkedHashMap datemapDataBase = onValue.value;
+                if (datemapDataBase.containsKey(date)) {
+                  LinkedHashMap timemapDatabase =
+                      datemapDataBase[date]["times"];
+                  timemapDatabase[time] = presentAbsent.toJson();
+                  print(timemapDatabase.keys);
+                  datemapDataBase[date]["times"] = timemapDatabase;
+                  print(datemapDataBase[date]["times"].keys);
+                  ref
+                      .child("Backup")
+                      .child(courseAttendance.courseName)
+                      .child("dates")
+                      .set(datemapDataBase);
+                } else {
+                  print(datemapDataBase.keys);
+                  datemapDataBase[date] = timeAttendance.toJson();
+                  print(datemapDataBase.keys);
+                  ref
+                      .child("Backup")
+                      .child(courseAttendance.courseName)
+                      .child("dates")
+                      .set(datemapDataBase);
+                }
+              });
+            } on PlatformException catch (e) {
+              print("Oops! " + e.toString());
+            }
+          } else {
+            BackupAttendance backupAttendance = new BackupAttendance(
+                courseAttendance.courseName,
+                courseAttendance.year,
+                courseAttendance.students,
+                datemap);
+            try {
+              ref
+                  .child("Backup")
+                  .child(backupAttendance.courseName)
+                  .set(backupAttendance.toJson());
+            } on PlatformException catch (e) {
+              print("Oops! " + e.toString());
+            }
+          }
+        }
       });
     } on PlatformException catch (e) {
       print("Oops! " + e.toString());
@@ -357,10 +452,12 @@ class PostAttendanceState extends State<PostAttendance> {
                                           });
                                           postFirebaseAttendance(
                                               this.courseAttendance);
+                                          postBackupAttendance(
+                                              this.courseAttendance);
                                         },
                                         color: Colors.teal,
                                         textColor: Colors.white),
-                                  )
+                                  ),
                                 ])))));
   }
 
