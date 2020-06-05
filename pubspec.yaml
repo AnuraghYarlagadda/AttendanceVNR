@@ -59,5 +59,13 @@ flutter:
   uses-material-design: true
   assets:
     - images/
+flutter_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "images/vnrvjiet.png"
 
+flutter_native_splash:
+  image: images/vnrvjiet.png
+  color: "#FFFFFF"
+  ios: false 
  
