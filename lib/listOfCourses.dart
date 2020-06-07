@@ -107,6 +107,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
   delFirebase(String courseName) async {
     final ref = fb.reference();
     ref.child("Courses").child(courseName).remove();
+    ref.child("Backup").child(courseName).remove();
     ref.child("CourseAttendance").child(courseName).remove();
     ref.child("TimeStamp").child(courseName).remove();
     List keys = [];

@@ -1,6 +1,7 @@
 import 'package:attendance/addCourse.dart';
 import 'package:attendance/contacts.dart';
 import 'package:attendance/coursesBackupList.dart';
+import 'package:attendance/displayDates.dart';
 import 'package:attendance/home.dart';
 import 'package:attendance/manageAdmins.dart';
 import 'package:attendance/manageCourseCoordinators.dart';
@@ -52,6 +53,8 @@ class MyApp extends StatelessWidget {
                 ShowAttendance(ModalRoute.of(context).settings.arguments),
             "yearAttendance": (context) =>
                 YearAttendance(ModalRoute.of(context).settings.arguments),
+            "displayDates": (context) =>
+                DisplayDates(ModalRoute.of(context).settings.arguments),
           },
         ));
   }

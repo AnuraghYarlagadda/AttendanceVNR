@@ -51,13 +51,13 @@ class PostAttendanceState extends State<PostAttendance> {
 
   getData() async {
     final ref = fb.reference().child("CourseAttendance");
-    await ref.once().then((onValue) {
+    await ref.once().then((onValue) async {
       if (onValue.value == null) {
         setState(() {
           this.status = Status.nodata.index;
         });
       } else {
-        ref.child(this.courseName).once().then((data) {
+        await ref.child(this.courseName).once().then((data) {
           print(data);
           if (data.value == null) {
             setState(() {
@@ -131,42 +131,45 @@ class PostAttendanceState extends State<PostAttendance> {
     });
   }
 
-  postFirebaseAttendance(CourseAttendance courseAttendance) {
+  postFirebaseAttendance(CourseAttendance courseAttendance) async {
     final ref = fb.reference();
     try {
-      ref
+      await ref
           .child("CourseAttendance")
           .child(courseAttendance.courseName)
           .set(courseAttendance.toJson());
       String timeStamp = DateFormat.yMEd().add_jms().format(DateTime.now());
-      ref.child("TimeStamp").child(courseAttendance.courseName).set(timeStamp);
-      Fluttertoast.showToast(
-          msg: courseAttendance.courseName.toLowerCase() +
-              " Attendance posted Successfully!",
-          toastLength: Toast.LENGTH_LONG,
-          backgroundColor: Colors.green,
-          textColor: Colors.white);
+      await ref
+          .child("TimeStamp")
+          .child(courseAttendance.courseName)
+          .set(timeStamp);
       Navigator.of(context).popUntil(ModalRoute.withName('courseDetails'));
       Navigator.of(context).pushReplacementNamed("courseDetails", arguments: {
         "courseName": courseAttendance.courseName,
         "route": "listOfCourses",
         "year": courseAttendance.year,
       });
+      Fluttertoast.showToast(
+          msg: courseAttendance.courseName.toLowerCase() +
+              " Attendance posted Successfully!",
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.green,
+          textColor: Colors.white);
     } on PlatformException catch (e) {
       print("Oops! " + e.toString());
     }
   }
 
-  postBackupAttendance(CourseAttendance courseAttendance) {
+  postBackupAttendance(CourseAttendance courseAttendance) async {
     var dateinput = new DateTime.now();
     var dateFormatter = new DateFormat('dd-MM-yyyy');
-    var timeFormatter = new DateFormat('H:m:s');
-    var hourFormatter = new DateFormat('H');
-    var minFormatter = new DateFormat('m');
+    var timeFormatter = new DateFormat('HH:mm:ss');
+    // var hourFormatter = new DateFormat('H');
+    // var minFormatter = new DateFormat('m');
     // int hour = int.tryParse(hourFormatter.format(dateinput)) ?? 0;
     // int min = int.tryParse(minFormatter.format(dateinput)) ?? 0;
     String date = dateFormatter.format(dateinput);
-    //String date = "14-06-2020";
+    //String date = "05-07-2020";
     String time = timeFormatter.format(dateinput);
     PresentAbsent presentAbsent = new PresentAbsent(
         courseAttendance.presentees, courseAttendance.absentees);
@@ -178,7 +181,7 @@ class PostAttendanceState extends State<PostAttendance> {
 
     final ref = fb.reference();
     try {
-      ref.child("Backup").once().then((onValue) {
+      await ref.child("Backup").once().then((onValue) async {
         if (onValue.value == null) {
           BackupAttendance backupAttendance = new BackupAttendance(
               courseAttendance.courseName,
@@ -186,7 +189,7 @@ class PostAttendanceState extends State<PostAttendance> {
               courseAttendance.students,
               datemap);
           try {
-            ref
+            await ref
                 .child("Backup")
                 .child(backupAttendance.courseName)
                 .set(backupAttendance.toJson());
@@ -197,12 +200,12 @@ class PostAttendanceState extends State<PostAttendance> {
           print(onValue.value.keys);
           if (onValue.value.keys.contains(courseAttendance.courseName)) {
             try {
-              ref
+              await ref
                   .child("Backup")
                   .child(courseAttendance.courseName)
                   .child("dates")
                   .once()
-                  .then((onValue) {
+                  .then((onValue) async {
                 LinkedHashMap datemapDataBase = onValue.value;
                 if (datemapDataBase.containsKey(date)) {
                   LinkedHashMap timemapDatabase =
@@ -211,7 +214,7 @@ class PostAttendanceState extends State<PostAttendance> {
                   print(timemapDatabase.keys);
                   datemapDataBase[date]["times"] = timemapDatabase;
                   print(datemapDataBase[date]["times"].keys);
-                  ref
+                  await ref
                       .child("Backup")
                       .child(courseAttendance.courseName)
                       .child("dates")
@@ -220,7 +223,7 @@ class PostAttendanceState extends State<PostAttendance> {
                   print(datemapDataBase.keys);
                   datemapDataBase[date] = timeAttendance.toJson();
                   print(datemapDataBase.keys);
-                  ref
+                  await ref
                       .child("Backup")
                       .child(courseAttendance.courseName)
                       .child("dates")
@@ -237,7 +240,7 @@ class PostAttendanceState extends State<PostAttendance> {
                 courseAttendance.students,
                 datemap);
             try {
-              ref
+              await ref
                   .child("Backup")
                   .child(backupAttendance.courseName)
                   .set(backupAttendance.toJson());

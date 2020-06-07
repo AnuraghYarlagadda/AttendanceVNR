@@ -21,6 +21,12 @@ class BackupAttendance {
       "dates": dates,
     };
   }
+
+  BackupAttendance.fromJson(LinkedHashMap<dynamic, dynamic> data)
+      : courseName = data["courseName"],
+        year = data["year"],
+        students = data["students"],
+        dates = data["dates"];
 }
 
 class TimeAttendance {
@@ -34,6 +40,9 @@ class TimeAttendance {
       "times": times,
     };
   }
+
+  TimeAttendance.fromJson(LinkedHashMap<dynamic, dynamic> data)
+      : times = data["times"];
 }
 
 class PresentAbsent {
@@ -46,4 +55,8 @@ class PresentAbsent {
   toJson() {
     return {"presentees": presentees, "absentees": absentees};
   }
+
+  PresentAbsent.fromJson(LinkedHashMap<dynamic, dynamic> data)
+      : presentees = data["presentees"],
+        absentees = data["absentees"];
 }

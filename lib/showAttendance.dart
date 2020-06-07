@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:attendance/DataModels/attendanceBackup.dart';
 import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
 import 'package:attendance/Utils/StoragePermissions.dart';
@@ -18,41 +19,84 @@ class ShowAttendance extends StatefulWidget {
 enum Status { data, nodata }
 
 class ShowAttendanceState extends State<ShowAttendance> {
-  String courseName, what, timeStamp;
+  String courseName, what, timeStamp, year;
   CourseAttendance courseAttendance;
   final fb = FirebaseDatabase.instance;
   int status;
   var display, displayList;
-
+  bool thereStudents;
   //PDF Utils
   String generatedPdfFilePath;
   List rows = [];
   var con;
+
+  //Backup Utils
+  var dataFromBackup;
+  PresentAbsent presentAbsent;
   @override
   void initState() {
     super.initState();
     print(widget.args);
     grantStoragePermissionAndCreateDir(context);
-    this.status = Status.data.index;
+    this.status = Status.nodata.index;
     this.timeStamp = "";
+    this.courseName = "";
+    this.what = "";
+    this.year = "";
     this.display = new List();
     this.displayList = new List<StudentDetails>();
+    this.dataFromBackup = new LinkedHashMap<dynamic, dynamic>();
     if (widget.args != null) {
       if (widget.args["route"] == "courseDetails") {
+        this.thereStudents = false;
         this.courseName = widget.args["courseName"];
         this.what = widget.args["what"];
+        getData();
+      } else if (widget.args["route"] == "displayDates") {
+        this.courseName = widget.args["courseName"];
+        this.year = widget.args["year"];
+        this.thereStudents = true;
+        this.timeStamp = widget.args["timeStamp"];
+        this.presentAbsent = widget.args["data"];
+        this.what = "present";
+        this.con="";
+        arrangeList();
       }
-      getData();
     }
+    print(this.courseName);
+    print(this.year);
+  }
+
+  arrangeList() {
+    this.display.clear();
+    this.displayList.clear();
+    this.rows.clear();
+    this.con="";
+    if (this.what == "present") {
+      if (this.presentAbsent.presentees != null)
+        this.display.addAll(this.presentAbsent.presentees);
+    } else if (this.what == "absent") {
+      if (this.presentAbsent.absentees != null)
+        this.display.addAll(this.presentAbsent.absentees);
+    }
+    setState(() {
+      this.display.forEach((f) {
+        this.displayList.add(new StudentDetails(f["rollNum"], f["name"]));
+      });
+      this.displayList
+        ..sort((StudentDetails a, StudentDetails b) =>
+            a.rollNum.toUpperCase().compareTo(b.rollNum.toUpperCase()));
+      genList();
+    });
   }
 
   getData() async {
     final ref = fb.reference();
     await ref.child("CourseAttendance").once().then((onValue) {
-      print(onValue.value);
+      // print(onValue.value);
       if (onValue.value == null) {
         setState(() {
-          this.status = Status.nodata.index;
+          this.status = Status.data.index;
         });
       } else {
         ref
@@ -63,12 +107,16 @@ class ShowAttendanceState extends State<ShowAttendance> {
           print(data);
           if (data.value == null) {
             setState(() {
-              this.status = Status.nodata.index;
+              this.status = Status.data.index;
             });
           } else {
             setState(() {
               this.status = Status.data.index;
               this.courseAttendance = CourseAttendance.fromSnapshot(data);
+              this.year = this.courseAttendance.year;
+              if (this.courseAttendance.students != null) {
+                this.thereStudents = true;
+              }
               if (this.what == "present") {
                 if (this.courseAttendance.presentees != null)
                   this.display.addAll(this.courseAttendance.presentees);
@@ -93,16 +141,16 @@ class ShowAttendanceState extends State<ShowAttendance> {
       }
     });
     await ref.child("TimeStamp").once().then((onValue) {
-      print(onValue.value);
+      // print(onValue.value);
       if (onValue.value == null) {
         setState(() {
-          this.status = Status.nodata.index;
+          this.status = Status.data.index;
         });
       } else {
         ref.child("TimeStamp").child(this.courseName).once().then((onValue) {
           if (onValue.value == null) {
             setState(() {
-              this.status = Status.nodata.index;
+              this.status = Status.data.index;
             });
           } else {
             setState(() {
@@ -125,14 +173,33 @@ class ShowAttendanceState extends State<ShowAttendance> {
           "Attendance",
           style: GoogleFonts.acme(),
         ),
+        actions: <Widget>[
+          Card(
+            color: Colors.white,
+            child: widget.args["route"] == "displayDates"
+                ? Switch(
+                    value: this.what == "present",
+                    onChanged: (value) {
+                      setState(() {
+                        this.what == "present"
+                            ? this.what = "absent"
+                            : this.what = "present";
+                      });
+                      arrangeList();
+                    },
+                    activeTrackColor: Colors.green,
+                    activeColor: Colors.white,
+                    inactiveTrackColor: Colors.red,
+                  )
+                : Padding(padding: EdgeInsets.all(0)),
+          )
+        ],
       ),
       body: (this.displayList.length == 0 &&
-              this.status == Status.data.index &&
+              this.status == Status.nodata.index &&
               this.timeStamp.length == 0)
           ? Center(child: SpinKitFadingFour(color: Colors.cyan))
-          : (this.courseAttendance == null &&
-                  this.displayList.length == 0 &&
-                  this.status == Status.nodata.index)
+          : ((this.thereStudents == false) && this.status == Status.data.index)
               ? Center(
                   child: Text("😕 EXCEL Sheet wasn't Added to the course yet!",
                       textAlign: TextAlign.center,
@@ -153,8 +220,7 @@ class ShowAttendanceState extends State<ShowAttendance> {
                         padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
                         child: ListTile(
                           isThreeLine: true,
-                          title: Text(
-                              this.courseAttendance.courseName.toUpperCase(),
+                          title: Text(this.courseName.toUpperCase(),
                               style: GoogleFonts.ptSerif(
                                   textStyle: TextStyle(
                                       color: Colors.indigo[900],
@@ -275,7 +341,7 @@ class ShowAttendanceState extends State<ShowAttendance> {
         <tbody>
           <tr>
           <td style='text-align:center'>${this.timeStamp}</td>
-          <td style='text-align:center'>${this.courseAttendance.year}</td>
+          <td style='text-align:center'>${this.year}</td>
           <td style='text-align:center'>${this.what.toUpperCase()}</td>
           </tr>
         </tbody>
@@ -298,16 +364,15 @@ class ShowAttendanceState extends State<ShowAttendance> {
     """;
 
     var targetPath = "/storage/emulated/0" + "/Attendance";
-    var targetFileName =
-        this.courseName + "_" + this.courseAttendance.year + "_" + this.what;
+    var targetFileName = this.courseName + "_" + this.year + "_" + this.what;
 
     var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
         htmlContent, targetPath, targetFileName);
     generatedPdfFilePath = generatedPdfFile.path;
     if (generatedPdfFilePath.isNotEmpty) {
       Fluttertoast.showToast(
-          msg: courseAttendance.courseName.toLowerCase() +
-              " Report Generated Successfully!",
+          msg:
+              this.courseName.toLowerCase() + " Report Generated Successfully!",
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.blue,
           textColor: Colors.white);

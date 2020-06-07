@@ -145,14 +145,16 @@ class HomeState extends State<Home> {
                   itemBuilder: (BuildContext context) {
                     return ['Sign-Out'].map((String choice) {
                       return PopupMenuItem<String>(
-                        enabled: this.userLoggedIn,
-                        height: MediaQuery.of(context).size.height / 18,
-                        value: choice,
-                        child: Text(choice,
-                            style: GoogleFonts.slabo27px(
-                              textStyle: TextStyle(fontSize: 15),
-                            )),
-                      );
+                          enabled: this.userLoggedIn,
+                          height: MediaQuery.of(context).size.height / 18,
+                          value: choice,
+                          child: ListTile(
+                            leading: Icon(Icons.exit_to_app),
+                            title: Text(choice,
+                                style: GoogleFonts.slabo27px(
+                                  textStyle: TextStyle(fontSize: 15),
+                                )),
+                          ));
                     }).toList();
                   },
                 ),

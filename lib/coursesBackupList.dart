@@ -91,7 +91,7 @@ class DisplayCoursesListBackupState extends State<DisplayCoursesListBackup> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text("Courses",
+          title: Text("Backup Courses",
               style: GoogleFonts.acme(
                 textStyle: TextStyle(),
               )),
@@ -272,7 +272,15 @@ class DisplayCoursesListBackupState extends State<DisplayCoursesListBackup> {
                                                           textColor:
                                                               Colors.white);
                                                       openWIFISettingsVNR();
-                                                    } else {}
+                                                    } else {
+                                                      Navigator.of(context)
+                                                          .pushNamed(
+                                                              "displayDates",
+                                                              arguments: items
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .courseName);
+                                                    }
                                                   });
                                                 }),
                                           )),
