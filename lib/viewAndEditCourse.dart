@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/courseDetails.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
+import 'package:attendance/DataModels/studentStats.dart';
 import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:file_picker/file_picker.dart';
@@ -26,6 +27,9 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
   CourseDetails courseDetails;
   String courseName, year;
   final fb = FirebaseDatabase.instance;
+
+  // Stats
+  var studentsStatList;
 
   Future<void> _launched;
 
@@ -57,6 +61,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     this.studentDetails = [];
     grantStoragePermissionAndCreateDir(context);
     this.students = new LinkedHashSet<StudentDetails>();
+    this.studentsStatList = new LinkedHashSet<StudentStats>();
     this.phone = [];
     print(widget.args);
     if (widget.args != null) {
@@ -187,6 +192,13 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
       });
     } on PlatformException catch (e) {
       print("Oops! " + e.toString());
+    }
+  }
+
+  postFirebaseStudents() async {
+    final ref = fb.reference();
+    for (var student in this.studentsStatList) {
+      await ref.child("Students").child(student.rollNum).set(student.toJson());
     }
   }
 
@@ -692,8 +704,11 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
               setState(() {
                 this.students.add(
                     new StudentDetails(table.rows[i][2], table.rows[i][1]));
+                this.studentsStatList.add(new StudentStats(table.rows[i][2],
+                    table.rows[i][1], this.year, this.courseName, 0, 0));
               });
             }
+            print(this.studentsStatList.length);
             print(this.students.length);
             this.students.forEach((f) {
               this.studentDetails.add(f.toJson());
@@ -702,6 +717,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
             CourseAttendance courseAttendance = new CourseAttendance(
                 this.courseName, this.year, this.studentDetails, null, null);
             postFirebaseCourseAttendance(courseAttendance);
+            postFirebaseStudents();
             this.studentDetails.clear();
             this.students.clear();
           } else {

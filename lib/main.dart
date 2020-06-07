@@ -8,6 +8,7 @@ import 'package:attendance/manageCourseCoordinators.dart';
 import 'package:attendance/postAttendance.dart';
 import 'package:attendance/showAttendance.dart';
 import 'package:attendance/showYearAttendance.dart';
+import 'package:attendance/studentReport.dart';
 import 'package:attendance/viewAndEditCourse.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
                 YearAttendance(ModalRoute.of(context).settings.arguments),
             "displayDates": (context) =>
                 DisplayDates(ModalRoute.of(context).settings.arguments),
+            "studentReport": (context) => StudentReport(),
           },
         ));
   }

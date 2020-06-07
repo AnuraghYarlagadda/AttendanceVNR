@@ -104,6 +104,41 @@ class DashBoardState extends State<DashBoard> {
                       height: 2.0,
                       thickness: 2.5,
                     ),
+                    ListTile(
+                        title: Text(
+                          "Student Report",
+                          style: GoogleFonts.nunito(
+                              textStyle: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                  fontStyle: FontStyle.normal)),
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(Icons.grade),
+                          iconSize: 25,
+                          color: Colors.purple,
+                          onPressed: () async {
+                            await (Connectivity().checkConnectivity())
+                                .then((onValue) {
+                              if (onValue == ConnectivityResult.none) {
+                                Fluttertoast.showToast(
+                                    msg: "No Active Internet Connection!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white);
+                                openWIFISettingsVNR();
+                              } else {
+                                Navigator.of(context)
+                                    .pushNamed("studentReport");
+                              }
+                            });
+                          },
+                        )),
+                    new Divider(
+                      height: 2.0,
+                      thickness: 2.5,
+                    ),
                   ]),
                 ),
     );
