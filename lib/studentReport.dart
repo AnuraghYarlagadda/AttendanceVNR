@@ -350,6 +350,16 @@ class _StudentReportState extends State<StudentReport> {
                                                 color: Colors.blueGrey,
                                                 fontWeight: FontWeight.w600)),
                                       ),
+                                      trailing: IconButton(
+                                          icon: Icon(
+                                            Icons.arrow_forward_ios,
+                                            color: Colors.pink,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pushNamed(
+                                                "statistics",
+                                                arguments: this.display[index]);
+                                          }),
                                     );
                                   })),
                     ],

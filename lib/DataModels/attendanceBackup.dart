@@ -4,20 +4,17 @@ import 'package:firebase_database/firebase_database.dart';
 
 class BackupAttendance {
   String courseName, year;
-  List students;
   LinkedHashMap dates;
-  BackupAttendance(this.courseName, this.year, this.students, this.dates);
+  BackupAttendance(this.courseName, this.year, this.dates);
   BackupAttendance.fromSnapshot(DataSnapshot snapshot)
       : courseName = snapshot.value["courseName"],
         year = snapshot.value["year"],
-        students = snapshot.value["students"],
         dates = snapshot.value["dates"];
 
   toJson() {
     return {
       "courseName": courseName,
       "year": year,
-      "students": students,
       "dates": dates,
     };
   }
@@ -25,7 +22,6 @@ class BackupAttendance {
   BackupAttendance.fromJson(LinkedHashMap<dynamic, dynamic> data)
       : courseName = data["courseName"],
         year = data["year"],
-        students = data["students"],
         dates = data["dates"];
 }
 

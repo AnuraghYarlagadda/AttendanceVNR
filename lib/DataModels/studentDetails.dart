@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:firebase_database/firebase_database.dart';
 
 class StudentDetails {
@@ -8,7 +10,9 @@ class StudentDetails {
   StudentDetails.fromSnapshot(DataSnapshot snapshot)
       : rollNum = snapshot.value["rollNum"],
         name = snapshot.value["name"];
-
+  StudentDetails.fromJson(LinkedHashMap<dynamic, dynamic> data)
+      : rollNum = data["rollNum"],
+        name = data["name"];
   toJson() {
     return {"rollNum": rollNum, "name": name};
   }

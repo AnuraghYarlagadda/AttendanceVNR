@@ -184,10 +184,7 @@ class PostAttendanceState extends State<PostAttendance> {
       await ref.child("Backup").once().then((onValue) async {
         if (onValue.value == null) {
           BackupAttendance backupAttendance = new BackupAttendance(
-              courseAttendance.courseName,
-              courseAttendance.year,
-              courseAttendance.students,
-              datemap);
+              courseAttendance.courseName, courseAttendance.year, datemap);
           try {
             await ref
                 .child("Backup")
@@ -235,10 +232,7 @@ class PostAttendanceState extends State<PostAttendance> {
             }
           } else {
             BackupAttendance backupAttendance = new BackupAttendance(
-                courseAttendance.courseName,
-                courseAttendance.year,
-                courseAttendance.students,
-                datemap);
+                courseAttendance.courseName, courseAttendance.year, datemap);
             try {
               await ref
                   .child("Backup")
