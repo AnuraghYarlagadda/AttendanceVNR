@@ -6,7 +6,7 @@ import 'package:attendance/Utils/Settings.dart';
 
 Directory applicationStorageDirectory;
 
-Future<Directory> createandgetDirectory(context) async {
+Future<Directory> createandgetDirectory(context, String dir) async {
   if (await Permission.storage.isPermanentlyDenied) {
     Fluttertoast.showToast(
         msg: "Enable Storage Permission in Settings!",
@@ -15,13 +15,11 @@ Future<Directory> createandgetDirectory(context) async {
         textColor: Colors.white);
     openAppSettingsVNR();
   } else {
-    if (await (Directory("/storage/emulated/0" + "/Attendance").exists())) {
+    if (await (Directory(dir).exists())) {
       print("Directory Exists!");
-      applicationStorageDirectory =
-          Directory("/storage/emulated/0" + "/Attendance");
+      applicationStorageDirectory = Directory(dir);
     } else {
-      new Directory("/storage/emulated/0" + "/Attendance")
-          .create(recursive: true)
+      new Directory(dir).create(recursive: true)
           // The created directory is returned as a Future.
           .then((Directory directory) {
         applicationStorageDirectory = directory;

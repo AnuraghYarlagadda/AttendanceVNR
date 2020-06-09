@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
+import 'package:attendance/Utils/StoragePermissions.dart';
+import 'package:attendance/Utils/openFileFromLocalStorage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
@@ -33,7 +35,9 @@ class YearAttendanceState extends State<YearAttendance> {
   List<String> years = ["1", "2", "3", "4"];
   String year;
   int _status;
-
+  //File Utils
+  var targetPath;
+  var targetFileName;
   @override
   void initState() {
     super.initState();
@@ -100,6 +104,11 @@ class YearAttendanceState extends State<YearAttendance> {
     setState(() {
       this.resultList = this.displayList["1"];
       this.year = "1";
+      grantStoragePermissionAndCreateDir(context,
+          "/storage/emulated/0" + "/Attendance/" + "Year_" + this.year);
+      this.targetPath =
+          "/storage/emulated/0" + "/Attendance/" + "Year_" + this.year;
+      this.targetFileName = "Year_" + this.year + "_" + this.what;
       this._status = Status.loaded.index;
       genList();
     });
@@ -107,6 +116,11 @@ class YearAttendanceState extends State<YearAttendance> {
 
   void filterSearchResults(String year) {
     setState(() {
+      grantStoragePermissionAndCreateDir(context,
+          "/storage/emulated/0" + "/Attendance/" + "Year_" + this.year);
+      this.targetPath =
+          "/storage/emulated/0" + "/Attendance/" + "Year_" + this.year;
+      this.targetFileName = "Year_" + this.year + "_" + this.what;
       this.resultList = this.displayList[year];
       genList();
     });
@@ -276,15 +290,32 @@ class YearAttendanceState extends State<YearAttendance> {
                                     );
                                   })),
                       Padding(
-                        padding: EdgeInsets.all(10),
-                        child: RaisedButton(
-                            child: Text("Generate Report"),
-                            onPressed: () async {
-                              await generateExampleDocument();
-                            },
-                            color: Colors.teal,
-                            textColor: Colors.white),
-                      )
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              RaisedButton(
+                                  child: Text("Generate Report"),
+                                  onPressed: () async {
+                                    await generateExampleDocument();
+                                  },
+                                  color: Colors.teal,
+                                  textColor: Colors.white),
+                              RaisedButton(
+                                  child: Text("Open Report"),
+                                  onPressed: () {
+                                    openFile(
+                                        context,
+                                        this.targetPath +
+                                            "/" +
+                                            this.targetFileName +
+                                            ".pdf",
+                                        "pdf");
+                                  },
+                                  color: Colors.deepOrange,
+                                  textColor: Colors.white),
+                            ],
+                          ))
                     ],
                   ),
                 ),
@@ -351,18 +382,21 @@ class YearAttendanceState extends State<YearAttendance> {
     </html>
     """;
 
-    var targetPath = "/storage/emulated/0" + "/Attendance";
-    var targetFileName = this.year + "_" + this.what;
-
-    var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
-        htmlContent, targetPath, targetFileName);
-    generatedPdfFilePath = generatedPdfFile.path;
-    if (generatedPdfFilePath.isNotEmpty) {
-      Fluttertoast.showToast(
-          msg: "Year " + this.year + " Report Generated Successfully!",
-          toastLength: Toast.LENGTH_LONG,
-          backgroundColor: Colors.blue,
-          textColor: Colors.white);
+    try {
+      var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
+          htmlContent, targetPath, targetFileName);
+      generatedPdfFilePath = generatedPdfFile.path;
+      if (generatedPdfFilePath.isNotEmpty) {
+        Fluttertoast.showToast(
+            msg: "Year " +
+                this.year.toLowerCase() +
+                " Report Generated Successfully!",
+            toastLength: Toast.LENGTH_LONG,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white);
+      }
+    } catch (identifier) {
+      print(identifier);
     }
   }
 }

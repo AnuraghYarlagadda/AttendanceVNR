@@ -4,7 +4,6 @@ import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/courseDetails.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
 import 'package:attendance/DataModels/studentStats.dart';
-import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -59,7 +58,6 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
     this.studentDetails = [];
-    grantStoragePermissionAndCreateDir(context);
     this.students = new LinkedHashSet<StudentDetails>();
     this.studentsStatList = new LinkedHashSet<StudentStats>();
     this.phone = [];

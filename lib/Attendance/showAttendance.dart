@@ -9,6 +9,7 @@ import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:attendance/Utils/openFileFromLocalStorage.dart';
 
 class ShowAttendance extends StatefulWidget {
   final LinkedHashMap args;
@@ -33,10 +34,13 @@ class ShowAttendanceState extends State<ShowAttendance> {
   //Backup Utils
   var dataFromBackup;
   PresentAbsent presentAbsent;
+
+  //FileUtils
+  var targetPath;
+  var targetFileName;
   @override
   void initState() {
     super.initState();
-    grantStoragePermissionAndCreateDir(context);
     this.status = Status.nodata.index;
     this.timeStamp = "";
     this.courseName = "";
@@ -50,6 +54,8 @@ class ShowAttendanceState extends State<ShowAttendance> {
         this.thereStudents = false;
         this.courseName = widget.args["courseName"];
         this.what = widget.args["what"];
+        grantStoragePermissionAndCreateDir(
+            context, "/storage/emulated/0" + "/Attendance/" + this.courseName);
         getData();
       } else if (widget.args["route"] == "displayDates") {
         this.courseName = widget.args["courseName"];
@@ -59,6 +65,13 @@ class ShowAttendanceState extends State<ShowAttendance> {
         this.presentAbsent = widget.args["data"];
         this.what = "present";
         this.con = "";
+        grantStoragePermissionAndCreateDir(
+            context,
+            "/storage/emulated/0" +
+                "/Attendance/" +
+                this.courseName +
+                "/" +
+                widget.args["date"]);
         arrangeList();
       }
     }
@@ -69,6 +82,20 @@ class ShowAttendanceState extends State<ShowAttendance> {
     this.displayList.clear();
     this.rows.clear();
     this.con = "";
+    if (widget.args["route"] == "displayDates") {
+      this.targetPath = "/storage/emulated/0" +
+          "/Attendance/" +
+          this.courseName +
+          "/" +
+          widget.args["date"];
+      this.targetFileName = this.courseName +
+          "_" +
+          this.year +
+          "_" +
+          this.what +
+          "_" +
+          widget.args["time"];
+    }
     if (this.what == "present") {
       if (this.presentAbsent.presentees != null)
         this.display.addAll(this.presentAbsent.presentees);
@@ -159,6 +186,11 @@ class ShowAttendanceState extends State<ShowAttendance> {
         });
       }
     });
+    if (widget.args["route"] == "courseDetails") {
+      this.targetPath =
+          "/storage/emulated/0" + "/Attendance/" + this.courseName;
+      this.targetFileName = this.courseName + "_" + this.year + "_" + this.what;
+    }
     genList();
   }
 
@@ -281,15 +313,32 @@ class ShowAttendanceState extends State<ShowAttendance> {
                                     );
                                   })),
                       Padding(
-                        padding: EdgeInsets.all(10),
-                        child: RaisedButton(
-                            child: Text("Generate Report"),
-                            onPressed: () async {
-                              await generateExampleDocument();
-                            },
-                            color: Colors.teal,
-                            textColor: Colors.white),
-                      )
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              RaisedButton(
+                                  child: Text("Generate Report"),
+                                  onPressed: () async {
+                                    await generateExampleDocument();
+                                  },
+                                  color: Colors.teal,
+                                  textColor: Colors.white),
+                              RaisedButton(
+                                  child: Text("Open Report"),
+                                  onPressed: () {
+                                    openFile(
+                                        context,
+                                        this.targetPath +
+                                            "/" +
+                                            this.targetFileName +
+                                            ".pdf",
+                                        "pdf");
+                                  },
+                                  color: Colors.deepOrange,
+                                  textColor: Colors.white),
+                            ],
+                          ))
                     ],
                   ),
                 ),
@@ -359,20 +408,20 @@ class ShowAttendanceState extends State<ShowAttendance> {
       </body>
     </html>
     """;
-
-    var targetPath = "/storage/emulated/0" + "/Attendance";
-    var targetFileName = this.courseName + "_" + this.year + "_" + this.what;
-
-    var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
-        htmlContent, targetPath, targetFileName);
-    generatedPdfFilePath = generatedPdfFile.path;
-    if (generatedPdfFilePath.isNotEmpty) {
-      Fluttertoast.showToast(
-          msg:
-              this.courseName.toLowerCase() + " Report Generated Successfully!",
-          toastLength: Toast.LENGTH_LONG,
-          backgroundColor: Colors.blue,
-          textColor: Colors.white);
+    try {
+      var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
+          htmlContent, targetPath, targetFileName);
+      generatedPdfFilePath = generatedPdfFile.path;
+      if (generatedPdfFilePath.isNotEmpty) {
+        Fluttertoast.showToast(
+            msg: this.courseName.toLowerCase() +
+                " Report Generated Successfully!",
+            toastLength: Toast.LENGTH_LONG,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white);
+      }
+    } catch (identifier) {
+      print(identifier);
     }
   }
 }

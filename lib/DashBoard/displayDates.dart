@@ -211,6 +211,9 @@ class DisplayDatesState extends State<DisplayDates> {
                                                                     arguments: {
                                                                   "route":
                                                                       "displayDates",
+                                                                  "date": key,
+                                                                  "time":
+                                                                      keytime,
                                                                   "timeStamp":
                                                                       key +
                                                                           " " +

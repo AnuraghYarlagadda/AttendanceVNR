@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:attendance/DataModels/studentStats.dart';
+import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
@@ -24,6 +25,8 @@ class _StudentReportState extends State<StudentReport> {
   @override
   void initState() {
     super.initState();
+    grantStoragePermissionAndCreateDir(
+        context, "/storage/emulated/0" + "/Attendance/"+"Students");
     this.status = Status.nodata.index;
     this.students = new List<StudentStats>();
     this.display = new List<StudentStats>();

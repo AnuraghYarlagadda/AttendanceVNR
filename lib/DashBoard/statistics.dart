@@ -1,8 +1,12 @@
 import 'dart:collection';
 import 'package:attendance/DataModels/attendanceBackup.dart';
 import 'package:attendance/DataModels/studentStats.dart';
+import 'package:attendance/Utils/StoragePermissions.dart';
+import 'package:attendance/Utils/openFileFromLocalStorage.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -32,6 +36,13 @@ class _StatisticsState extends State<Statistics> {
   double width, height;
   List chartTypes = ["Pie Chart", "Bar Graph"];
   String what;
+  //PDF Utils
+  String generatedPdfFilePath;
+  List rows = [];
+  var con;
+  //FileUtils
+  var targetPath;
+  var targetFileName;
   @override
   void initState() {
     super.initState();
@@ -42,6 +53,17 @@ class _StatisticsState extends State<Statistics> {
         widget.studentStats.courseName,
         widget.studentStats.present,
         widget.studentStats.absent);
+    grantStoragePermissionAndCreateDir(
+        context,
+        "/storage/emulated/0" +
+            "/Attendance/" +
+            "Students/" +
+            this.studentStats.rollNum);
+    this.targetPath = "/storage/emulated/0" +
+        "/Attendance/" +
+        "Students/" +
+        this.studentStats.rollNum;
+    this.targetFileName = this.studentStats.rollNum + "_Report";
     this.status = Status.nodata.index;
     this.what = chartTypes[0];
     this.dates = new LinkedHashMap<dynamic, TimeAttendance>();
@@ -57,6 +79,9 @@ class _StatisticsState extends State<Statistics> {
     final ref = fb.reference();
     await ref.child("Backup").once().then((onValue) {
       if (onValue.value == null) {
+        setState(() {
+          this.status = Status.data.index;
+        });
       } else {
         if (onValue.value.keys.contains(this.studentStats.courseName)) {
           setState(() {
@@ -148,10 +173,14 @@ class _StatisticsState extends State<Statistics> {
                 this.studentStats.present.toDouble();
             this.presentAbsentCount["Absent"] =
                 this.studentStats.absent.toDouble();
-
+            genList();
             this.status = Status.data.index;
           });
-        } else {}
+        } else {
+          setState(() {
+            this.status = Status.data.index;
+          });
+        }
       }
     });
   }
@@ -318,9 +347,126 @@ class _StatisticsState extends State<Statistics> {
                                   ),
                                 ),
                               ),
+                        Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                RaisedButton(
+                                    child: Text("Generate Report"),
+                                    onPressed: () async {
+                                      await generateExampleDocument();
+                                    },
+                                    color: Colors.teal,
+                                    textColor: Colors.white),
+                                RaisedButton(
+                                    child: Text("Open Report"),
+                                    onPressed: () {
+                                      openFile(
+                                          context,
+                                          this.targetPath +
+                                              "/" +
+                                              this.targetFileName +
+                                              ".pdf",
+                                          "pdf");
+                                    },
+                                    color: Colors.deepOrange,
+                                    textColor: Colors.white),
+                              ],
+                            ))
                       ],
                     ),
                   ));
+  }
+
+  genList() {
+    int i = 1;
+    this.attendance.forEach((k, v) {
+      String status = v ? "Present" : "Absent";
+      this.rows.add(
+          "<tr><td style='text-align:center'>${i.toString()}</td><td style='text-align:center'>${k.toString()}</td><td style='text-align:center'>${status.trim()}</td></tr>");
+      i++;
+    });
+
+    this.con = this.rows.join();
+  }
+
+  Future<void> generateExampleDocument() async {
+    int totalDuration = this.studentStats.present + this.studentStats.absent;
+    var htmlContent = """
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+        table, th, td {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+        th, td, p {
+          padding: 5px;
+          text-align: left;
+        }
+        </style>
+      </head>
+      <body>
+      <img src="https://img.techpowerup.org/200530/logo-new-1-converted-1.png" width="1100" height="300" alt="web-img">
+        <h1 style='text-align:center;color:Crimson;font-size:30px;font-family:Almendra;'>${this.studentStats.name.toUpperCase()}</h1>
+        <br />
+       <table style="width:100%">
+        <thead>
+        <tr>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Student Name</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Student Roll No.</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Year</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Course Enrolled</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>Course Duration</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>No. of Days Present</th>
+        <th style='text-align:center;color:Teal;font-size:20px;'>No. of Days Absent</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td style='text-align:center'>${this.studentStats.name.toUpperCase()}</td>
+          <td style='text-align:center'>${this.studentStats.rollNum}</td>
+          <td style='text-align:center'>${this.studentStats.year}</td>
+          <td style='text-align:center'>${this.studentStats.courseName.toUpperCase()}</td>
+          <td style='text-align:center'>${totalDuration.toString()}</td>
+          <td style='text-align:center'>${this.studentStats.present.toString()}</td>
+          <td style='text-align:center'>${this.studentStats.absent.toString()}</td>
+          </tr>
+        </tbody>
+        </table>
+        <br><br>
+        <br><br>
+        <table style="width:100%">
+        <thead>
+        <tr>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>S. No.</th>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>Date</th>
+        <th style='text-align:center;color:DarkBlue;font-size:20px;'>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+          $con
+        </tbody>
+        </table>
+      </body>
+    </html>
+    """;
+    try {
+      var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
+          htmlContent, targetPath, targetFileName);
+      generatedPdfFilePath = generatedPdfFile.path;
+      if (generatedPdfFilePath.isNotEmpty) {
+        Fluttertoast.showToast(
+            msg: this.studentStats.rollNum + " Report Generated Successfully!",
+            toastLength: Toast.LENGTH_LONG,
+            backgroundColor: Colors.blue,
+            textColor: Colors.white);
+      }
+    } catch (identifier) {
+      print(identifier);
+    }
   }
 }
 
