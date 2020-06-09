@@ -36,7 +36,6 @@ class ShowAttendanceState extends State<ShowAttendance> {
   @override
   void initState() {
     super.initState();
-    print(widget.args);
     grantStoragePermissionAndCreateDir(context);
     this.status = Status.nodata.index;
     this.timeStamp = "";
@@ -59,19 +58,17 @@ class ShowAttendanceState extends State<ShowAttendance> {
         this.timeStamp = widget.args["timeStamp"];
         this.presentAbsent = widget.args["data"];
         this.what = "present";
-        this.con="";
+        this.con = "";
         arrangeList();
       }
     }
-    print(this.courseName);
-    print(this.year);
   }
 
   arrangeList() {
     this.display.clear();
     this.displayList.clear();
     this.rows.clear();
-    this.con="";
+    this.con = "";
     if (this.what == "present") {
       if (this.presentAbsent.presentees != null)
         this.display.addAll(this.presentAbsent.presentees);
@@ -92,19 +89,17 @@ class ShowAttendanceState extends State<ShowAttendance> {
 
   getData() async {
     final ref = fb.reference();
-    await ref.child("CourseAttendance").once().then((onValue) {
-      // print(onValue.value);
+    await ref.child("CourseAttendance").once().then((onValue) async {
       if (onValue.value == null) {
         setState(() {
           this.status = Status.data.index;
         });
       } else {
-        ref
+        await ref
             .child("CourseAttendance")
             .child(this.courseName)
             .once()
             .then((data) {
-          print(data);
           if (data.value == null) {
             setState(() {
               this.status = Status.data.index;
@@ -140,14 +135,17 @@ class ShowAttendanceState extends State<ShowAttendance> {
         });
       }
     });
-    await ref.child("TimeStamp").once().then((onValue) {
-      // print(onValue.value);
+    await ref.child("TimeStamp").once().then((onValue) async {
       if (onValue.value == null) {
         setState(() {
           this.status = Status.data.index;
         });
       } else {
-        ref.child("TimeStamp").child(this.courseName).once().then((onValue) {
+        await ref
+            .child("TimeStamp")
+            .child(this.courseName)
+            .once()
+            .then((onValue) {
           if (onValue.value == null) {
             setState(() {
               this.status = Status.data.index;
@@ -162,7 +160,6 @@ class ShowAttendanceState extends State<ShowAttendance> {
       }
     });
     genList();
-    print(this.displayList.length);
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:attendance/DataModels/adminDetails.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:contacts_service/contacts_service.dart';
@@ -36,7 +35,6 @@ class ManageAdminState extends State<ManageAdmin> {
     this.admins = <AdminDetails>{};
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
-    print(widget.args);
     if (widget.args != null) {
       Contact contact = widget.args["contact"];
       emailController.text = widget.args["email"];
@@ -75,7 +73,7 @@ class ManageAdminState extends State<ManageAdmin> {
         }
       }
     }
-    print(this.admins);
+
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
@@ -98,26 +96,16 @@ class ManageAdminState extends State<ManageAdmin> {
       setState(() {
         try {
           this.admins.add(adminDetails);
-        } catch (identifier) {
-          print("Added  ");
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.admins.length);
     });
     ref.onChildRemoved.listen((onData) {
-      print(onData.snapshot.value);
       adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
       setState(() {
         try {
           this.admins.removeWhere((value) => value.email == adminDetails.email);
-        } catch (identifier) {
-          print("Removed  ");
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print("Manage");
-      print(this.admins.length);
     });
     ref.onChildChanged.listen((onData) {
       adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
@@ -129,49 +117,40 @@ class ManageAdminState extends State<ManageAdmin> {
               value.phone = adminDetails.phone;
             }
           });
-        } catch (identifier) {
-          print("Changed  ");
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.admins.length);
     });
   }
 
-  postFirebase(AdminDetails adminDetails) {
-    print(adminDetails.email + "    " + (adminDetails.permission.toString()));
-    adminDetails.phone.forEach((f) {
-      print(f);
-    });
+  postFirebase(AdminDetails adminDetails) async {
     String id = adminDetails.email.replaceAll('.', ',');
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
     final ref = fb.reference();
-    ref.child("Admins").child(id).set(adminDetails.toJson());
+    await ref.child("Admins").child(id).set(adminDetails.toJson());
   }
 
-  changePermissionFirebase(String email, bool permission) {
+  changePermissionFirebase(String email, bool permission) async {
     final ref = fb.reference();
-    //print(email);
+
     String id = email.replaceAll('.', ',');
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
-    ref.child("Admins").child(id).child("permission").set(permission);
+    await ref.child("Admins").child(id).child("permission").set(permission);
   }
 
-  delFirebase(String email) {
+  delFirebase(String email) async {
     final ref = fb.reference();
-    //print(email);
     String id = email.replaceAll('.', ',');
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
-    ref.child("Admins").child(id).remove();
+    await ref.child("Admins").child(id).remove();
   }
 
   Future<void> _makePhoneCall(String url) async {

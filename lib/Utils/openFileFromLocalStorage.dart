@@ -33,6 +33,4 @@ Future<void> openFile(
         gravity: ToastGravity.BOTTOM);
     openAppSettingsVNR();
   }
-  print(result.message);
-  print(result.type);
 }

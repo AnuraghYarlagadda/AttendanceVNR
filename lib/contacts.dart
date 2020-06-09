@@ -18,7 +18,6 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   void initState() {
     getContacts();
-    print(widget.args);
     super.initState();
   }
 
@@ -30,7 +29,6 @@ class _ContactsPageState extends State<ContactsPage> {
       _contacts = contacts;
       this.items = new LinkedHashSet<Contact>();
       this.items.addAll(_contacts.toList());
-      print(this.items.length);
     });
   }
 

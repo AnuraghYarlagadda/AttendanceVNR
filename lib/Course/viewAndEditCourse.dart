@@ -63,7 +63,6 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     this.students = new LinkedHashSet<StudentDetails>();
     this.studentsStatList = new LinkedHashSet<StudentStats>();
     this.phone = [];
-    print(widget.args);
     if (widget.args != null) {
       if (widget.args["route"] != null) {
         if (widget.args["route"] == "listOfCourses") {
@@ -137,10 +136,10 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     venueController.dispose();
   }
 
-  getData(String courseName) {
+  getData(String courseName) async {
     final ref = fb.reference();
     String id = courseName.trim().toLowerCase();
-    ref.child("Courses").child(id).once().then((DataSnapshot data) {
+    await ref.child("Courses").child(id).once().then((DataSnapshot data) {
       setState(() {
         this.courseDetails = CourseDetails.fromSnapshot(data);
         this.courseName = this.courseDetails.courseName;
@@ -149,11 +148,10 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
     });
   }
 
-  postFirebase(CourseDetails courseDetails) {
-    print(courseDetails.courseName);
+  postFirebase(CourseDetails courseDetails) async {
     final ref = fb.reference();
     try {
-      ref
+      await ref
           .child("Courses")
           .child(courseDetails.courseName)
           .set(courseDetails.toJson());
@@ -167,16 +165,13 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         "courseName": courseDetails.courseName,
         "route": "listOfCourses"
       });
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
-  postFirebaseCourseAttendance(CourseAttendance courseAttendance) {
-    print(courseAttendance.courseName);
+  postFirebaseCourseAttendance(CourseAttendance courseAttendance) async {
     final ref = fb.reference();
     try {
-      ref
+      await ref
           .child("CourseAttendance")
           .child(courseAttendance.courseName)
           .set(courseAttendance.toJson());
@@ -190,9 +185,7 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         "route": "listOfCourses",
         "year": courseDetails.year,
       });
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
   postFirebaseStudents() async {
@@ -280,7 +273,6 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                                             icon: Icon(Icons.check,
                                                 color: Colors.green),
                                             onPressed: () {
-                                              print(facultyNameController.text);
                                               if (facultyNameController.text
                                                       .trim()
                                                       .length ==
@@ -416,7 +408,6 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                                             icon: Icon(Icons.check,
                                                 color: Colors.green),
                                             onPressed: () {
-                                              print(venueController.text);
                                               if (venueController.text
                                                       .trim()
                                                       .length ==
@@ -684,13 +675,12 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         file = await FilePicker.getFile(
             type: FileType.custom, allowedExtensions: ['xlsx']);
         if (file != null) {
-          print(file);
           var bytes = file.readAsBytesSync();
           var decoder = SpreadsheetDecoder.decodeBytes(bytes);
           decoder.tables.keys.forEach((f) {
             f = f.toString().toLowerCase();
           });
-          print(decoder.tables.keys);
+
           if (decoder.tables.keys.contains(this.courseName.toLowerCase())) {
             var table = decoder.tables[this.courseName.toLowerCase()];
             var j;
@@ -708,12 +698,11 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                     table.rows[i][1], this.year, this.courseName, 0, 0));
               });
             }
-            print(this.studentsStatList.length);
-            print(this.students.length);
+
             this.students.forEach((f) {
               this.studentDetails.add(f.toJson());
             });
-            print(this.studentDetails.length);
+
             CourseAttendance courseAttendance = new CourseAttendance(
                 this.courseName, this.year, this.studentDetails, null, null);
             postFirebaseCourseAttendance(courseAttendance);

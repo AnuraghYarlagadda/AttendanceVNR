@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:attendance/DataModels/courseAttendance.dart';
 import 'package:attendance/DataModels/studentDetails.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -38,7 +37,6 @@ class YearAttendanceState extends State<YearAttendance> {
   @override
   void initState() {
     super.initState();
-    print(widget.args);
     if (widget.args != null) {
       this.what = widget.args["what"];
     }
@@ -207,7 +205,6 @@ class YearAttendanceState extends State<YearAttendance> {
                                       GroupedButtonsOrientation.HORIZONTAL,
                                   onSelected: (String selected) => setState(() {
                                     year = selected;
-                                    print("Year = " + this.year);
                                     filterSearchResults(this.year);
                                   }),
                                   labels: this.years,

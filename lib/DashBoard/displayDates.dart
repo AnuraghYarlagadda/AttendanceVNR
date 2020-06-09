@@ -26,7 +26,6 @@ class DisplayDatesState extends State<DisplayDates> {
   @override
   void initState() {
     super.initState();
-    print(widget.courseName);
     this.status = Status.nodata.index;
     this.courseName = widget.courseName;
     this.year = "";
@@ -42,7 +41,6 @@ class DisplayDatesState extends State<DisplayDates> {
           this.status = Status.data.index;
         });
       } else {
-        print(onValue.value.keys);
         if (onValue.value.keys.contains(this.courseName)) {
           setState(() {
             this.status = Status.data.index;
@@ -50,7 +48,6 @@ class DisplayDatesState extends State<DisplayDates> {
                 BackupAttendance.fromJson(onValue.value[this.courseName]);
             this.year = this.backupAttendance.year;
             this.dates = this.backupAttendance.dates;
-            print(this.dates.length);
           });
         } else {
           setState(() {
@@ -73,35 +70,29 @@ class DisplayDatesState extends State<DisplayDates> {
     });
   }
 
-  delFirebaseBackup(String date, String time) {
+  delFirebaseBackup(String date, String time) async {
     final ref = fb.reference();
-    print(date);
-    print(time);
+
     setState(() {
       this.dates.forEach((k, v) {
         if (k == date) {
           TimeAttendance timeAttendance = this.dates[date];
-          print(timeAttendance.times.keys);
+
           timeAttendance.times.remove(time);
-          print(timeAttendance.times.keys);
         }
       });
       this.backupAttendance.dates.clear();
       this.backupAttendance.dates.addAll(this.dates);
       this.backupAttendance.dates.forEach((k, v) {
         this.backupAttendance.dates[k] = v.toJson();
-        print(this.backupAttendance.dates[k]["times"].keys);
       });
-      // print(this.backupAttendance.toJson());
     });
     try {
-      ref
+      await ref
           .child("Backup")
           .child(backupAttendance.courseName)
           .set(backupAttendance.toJson());
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
   @override

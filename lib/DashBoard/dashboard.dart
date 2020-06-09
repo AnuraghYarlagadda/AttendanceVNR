@@ -23,20 +23,20 @@ class DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     super.initState();
-    print(widget.email);
+
     getCurrentAdmins(widget.email);
     this.status = Status.nodata.index;
     this.permission = false;
   }
 
-  getCurrentAdmins(String email) {
+  getCurrentAdmins(String email) async {
     String id = email.replaceAll('.', ',');
     id = id.replaceAll('@', ',');
     id = id.replaceAll('#', ',');
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
     final ref = fb.reference().child("Admins").child(id);
-    ref.once().then((onValue) {
+    await ref.once().then((onValue) {
       if (onValue.value == null) {
         setState(() {
           this.status = Status.data.index;
@@ -47,12 +47,9 @@ class DashBoardState extends State<DashBoard> {
             this.adminDetails = AdminDetails.fromSnapshot(onValue);
             this.status = Status.data.index;
             this.permission = this.adminDetails.permission;
-          } catch (identifier) {
-            print(identifier);
-          }
+          } catch (identifier) {}
         });
       }
-      print(this.adminDetails);
     });
   }
 

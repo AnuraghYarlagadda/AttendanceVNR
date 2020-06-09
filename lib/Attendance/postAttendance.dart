@@ -33,7 +33,6 @@ class PostAttendanceState extends State<PostAttendance> {
   @override
   void initState() {
     super.initState();
-    print(widget.args);
     this.status = Status.data.index;
     this.total = new List();
     this.presentees = new List();
@@ -58,7 +57,6 @@ class PostAttendanceState extends State<PostAttendance> {
         });
       } else {
         await ref.child(this.courseName).once().then((data) {
-          print(data);
           if (data.value == null) {
             setState(() {
               this.status = Status.nodata.index;
@@ -155,9 +153,7 @@ class PostAttendanceState extends State<PostAttendance> {
           toastLength: Toast.LENGTH_LONG,
           backgroundColor: Colors.green,
           textColor: Colors.white);
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
   postBackupAttendance(CourseAttendance courseAttendance) async {
@@ -190,11 +186,8 @@ class PostAttendanceState extends State<PostAttendance> {
                 .child("Backup")
                 .child(backupAttendance.courseName)
                 .set(backupAttendance.toJson());
-          } on PlatformException catch (e) {
-            print("Oops! " + e.toString());
-          }
+          } on PlatformException catch (e) {}
         } else {
-          print(onValue.value.keys);
           if (onValue.value.keys.contains(courseAttendance.courseName)) {
             try {
               await ref
@@ -208,18 +201,17 @@ class PostAttendanceState extends State<PostAttendance> {
                   LinkedHashMap timemapDatabase =
                       datemapDataBase[date]["times"];
                   timemapDatabase[time] = presentAbsent.toJson();
-                  print(timemapDatabase.keys);
+
                   datemapDataBase[date]["times"] = timemapDatabase;
-                  print(datemapDataBase[date]["times"].keys);
+
                   await ref
                       .child("Backup")
                       .child(courseAttendance.courseName)
                       .child("dates")
                       .set(datemapDataBase);
                 } else {
-                  print(datemapDataBase.keys);
                   datemapDataBase[date] = timeAttendance.toJson();
-                  print(datemapDataBase.keys);
+
                   await ref
                       .child("Backup")
                       .child(courseAttendance.courseName)
@@ -227,9 +219,7 @@ class PostAttendanceState extends State<PostAttendance> {
                       .set(datemapDataBase);
                 }
               });
-            } on PlatformException catch (e) {
-              print("Oops! " + e.toString());
-            }
+            } on PlatformException catch (e) {}
           } else {
             BackupAttendance backupAttendance = new BackupAttendance(
                 courseAttendance.courseName, courseAttendance.year, datemap);
@@ -238,15 +228,11 @@ class PostAttendanceState extends State<PostAttendance> {
                   .child("Backup")
                   .child(backupAttendance.courseName)
                   .set(backupAttendance.toJson());
-            } on PlatformException catch (e) {
-              print("Oops! " + e.toString());
-            }
+            } on PlatformException catch (e) {}
           }
         }
       });
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
   @override

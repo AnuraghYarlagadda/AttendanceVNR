@@ -34,7 +34,6 @@ class AddCourseState extends State<AddCourse> {
   @override
   void initState() {
     super.initState();
-    print(widget.args);
     this.contactWidget = [];
     this.phones = new LinkedHashSet<dynamic>();
     this.phone = [];
@@ -83,11 +82,10 @@ class AddCourseState extends State<AddCourse> {
     }
   }
 
-  postFirebase(CourseDetails courseDetails) {
-    print(courseDetails.courseName);
+  postFirebase(CourseDetails courseDetails) async {
     final ref = fb.reference();
     try {
-      ref
+      await ref
           .child("Courses")
           .child(courseDetails.courseName)
           .set(courseDetails.toJson());
@@ -97,9 +95,7 @@ class AddCourseState extends State<AddCourse> {
           backgroundColor: Colors.green,
           textColor: Colors.white);
       Navigator.of(context).pushReplacementNamed("listOfCourses");
-    } on PlatformException catch (e) {
-      print("Oops! " + e.toString());
-    }
+    } on PlatformException catch (e) {}
   }
 
   @override
@@ -307,7 +303,6 @@ class AddCourseState extends State<AddCourse> {
                           orientation: GroupedButtonsOrientation.HORIZONTAL,
                           onSelected: (String selected) => setState(() {
                             year = selected;
-                            print(this.year);
                           }),
                           labels: yearTypes,
                           labelStyle: TextStyle(

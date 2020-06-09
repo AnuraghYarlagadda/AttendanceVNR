@@ -40,7 +40,6 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     this.phones = new LinkedHashSet<dynamic>();
     this.courseName = "";
     this.courses = new LinkedHashMap<dynamic, bool>();
-    print(widget.args);
     if (widget.args != null) {
       if (widget.args["route"] == "courseDetails") {
         this.courseName = widget.args["courseName"];
@@ -84,7 +83,7 @@ class ManageCordinatorsState extends State<ManageCordinators> {
         }
       }
     }
-    print(this.coordinators);
+
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
@@ -107,46 +106,23 @@ class ManageCordinatorsState extends State<ManageCordinators> {
           CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
       setState(() {
         try {
-          print("On ADDED");
-          print(coordinatorsDetails.email);
-          print(coordinatorsDetails.courses);
           if (coordinatorsDetails.courses.containsKey(this.courseName)) {
             this.coordinators.add(coordinatorsDetails);
           }
-          print(this.coordinators.length);
-        } catch (identifier) {
-          print("Added  ");
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.courseName);
-      print(this.coordinators.length);
     });
     ref.onChildRemoved.listen((onData) {
-      print(onData.snapshot.value);
       coordinatorsDetails =
           CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
       setState(() {
-        print("On REMOVED");
-        print(coordinatorsDetails.email);
-        print(coordinatorsDetails.courses);
-        try {
-          print("Removed");
-        } catch (identifier) {
-          print("Removed  ");
-          print(identifier);
-        }
+        try {} catch (identifier) {}
       });
-      print("Manage");
-      print(this.coordinators.length);
     });
     ref.onChildChanged.listen((onData) {
       coordinatorsDetails =
           CourseCoordinatorsDetails.fromSnapshot(onData.snapshot);
-      setState(() {
-        print("On CHANGED");
-        print(coordinatorsDetails.email);
-        print(coordinatorsDetails.courses);
+      setState(() async {
         if (coordinatorsDetails.courses != null) {
           if (coordinatorsDetails.courses.containsKey(this.courseName)) {
             if (this
@@ -161,7 +137,6 @@ class ManageCordinatorsState extends State<ManageCordinators> {
               this.coordinators.add(coordinatorsDetails);
             }
           } else {
-            print("akkada");
             if (this
                     .coordinators
                     .where((item) => (item.email == coordinatorsDetails.email))
@@ -172,7 +147,6 @@ class ManageCordinatorsState extends State<ManageCordinators> {
             }
           }
         } else {
-          print("ikkada");
           if (this
                   .coordinators
                   .where((item) => (item.email == coordinatorsDetails.email))
@@ -187,15 +161,13 @@ class ManageCordinatorsState extends State<ManageCordinators> {
           id = id.replaceAll('#', ',');
           id = id.replaceAll('[', ',');
           id = id.replaceAll(']', ',');
-          ref.child(id).remove();
+          await ref.child(id).remove();
         }
       });
-      print(this.courseName);
-      print(this.coordinators.length);
     });
   }
 
-  postFirebase(CourseCoordinatorsDetails coordinatorsDetails) {
+  postFirebase(CourseCoordinatorsDetails coordinatorsDetails) async {
     String id = coordinatorsDetails.email.replaceAll('.', ',');
     LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
     id = id.replaceAll('@', ',');
@@ -203,15 +175,14 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
     final ref = fb.reference();
-    ref
+    await ref
         .child("CourseCoordinators")
         .child(id)
         .child("courses")
         .once()
-        .then((onValue) {
-      print(onValue.value);
+        .then((onValue) async {
       if (onValue.value == null) {
-        ref
+        await ref
             .child("CourseCoordinators")
             .child(id)
             .set(coordinatorsDetails.toJson());
@@ -221,7 +192,7 @@ class ManageCordinatorsState extends State<ManageCordinators> {
           courses[k] = v;
         });
         coordinatorsDetails.courses = courses;
-        ref
+        await ref
             .child("CourseCoordinators")
             .child(id)
             .set(coordinatorsDetails.toJson());
@@ -230,7 +201,7 @@ class ManageCordinatorsState extends State<ManageCordinators> {
   }
 
   changePermissionFirebase(
-      CourseCoordinatorsDetails coordinatorsDetails, bool permission) {
+      CourseCoordinatorsDetails coordinatorsDetails, bool permission) async {
     String id = coordinatorsDetails.email.replaceAll('.', ',');
     LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
     id = id.replaceAll('@', ',');
@@ -238,19 +209,18 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
     final ref = fb.reference();
-    ref
+    await ref
         .child("CourseCoordinators")
         .child(id)
         .child("courses")
         .once()
-        .then((onValue) {
-      print(onValue.value);
+        .then((onValue) async {
       if (onValue.value == null) {
       } else {
         courses = onValue.value;
         courses[this.courseName] = permission;
         coordinatorsDetails.courses = courses;
-        ref
+        await ref
             .child("CourseCoordinators")
             .child(id)
             .set(coordinatorsDetails.toJson());
@@ -258,7 +228,7 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     });
   }
 
-  delFirebase(CourseCoordinatorsDetails coordinatorsDetails) {
+  delFirebase(CourseCoordinatorsDetails coordinatorsDetails) async {
     String id = coordinatorsDetails.email.replaceAll('.', ',');
     LinkedHashMap courses = new LinkedHashMap<dynamic, bool>();
     id = id.replaceAll('@', ',');
@@ -266,19 +236,18 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     id = id.replaceAll('[', ',');
     id = id.replaceAll(']', ',');
     final ref = fb.reference();
-    ref
+    await ref
         .child("CourseCoordinators")
         .child(id)
         .child("courses")
         .once()
-        .then((onValue) {
-      print(onValue.value);
+        .then((onValue) async {
       if (onValue.value == null) {
       } else {
         courses = onValue.value;
         courses.remove(this.courseName);
         coordinatorsDetails.courses = courses;
-        ref
+        await ref
             .child("CourseCoordinators")
             .child(id)
             .set(coordinatorsDetails.toJson());
@@ -594,7 +563,7 @@ class ManageCordinatorsState extends State<ManageCordinators> {
                                                   this.phones.toList(),
                                                   this.courses);
                                         }
-                                        print(coordinatorsDetails.toJson());
+
                                         postFirebase(coordinatorsDetails);
                                         Fluttertoast.showToast(
                                             msg: "User Added " +

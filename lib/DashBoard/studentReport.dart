@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:attendance/DataModels/studentStats.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -59,9 +58,6 @@ class _StudentReportState extends State<StudentReport> {
               a.rollNum.compareTo(b.rollNum));
           this.status = Status.data.index;
         });
-        print(onValue.value.keys.length);
-        print(this.students.length);
-        print(this.display.length);
       }
     });
   }
@@ -281,7 +277,6 @@ class _StudentReportState extends State<StudentReport> {
                                       GroupedButtonsOrientation.HORIZONTAL,
                                   onSelected: (String selected) => setState(() {
                                     year = selected;
-                                    print("Year = " + this.year);
                                     editingController.clear();
                                     filterSearchResults("");
                                   }),

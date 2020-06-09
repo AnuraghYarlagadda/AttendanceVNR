@@ -51,11 +51,8 @@ class DisplayCoursesListBackupState extends State<DisplayCoursesListBackup> {
           this.courses.add(courseDetails);
           this.items.add(courseDetails);
           this._status = Status.loaded.index;
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.courses.length);
     });
     if (this.items.length == 0 && courseDetails == null) {
       setState(() {
@@ -191,7 +188,7 @@ class DisplayCoursesListBackupState extends State<DisplayCoursesListBackup> {
                                       GroupedButtonsOrientation.HORIZONTAL,
                                   onSelected: (String selected) => setState(() {
                                     year = selected;
-                                    print("Year = " + this.year);
+
                                     filterSearchResults(this.year);
                                   }),
                                   labels: yearTypes,

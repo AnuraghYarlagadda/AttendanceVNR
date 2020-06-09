@@ -51,11 +51,8 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
           this.courses.add(courseDetails);
           this.items.add(courseDetails);
           this._status = Status.loaded.index;
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.courses.length);
     });
     if (this.items.length == 0 && courseDetails == null) {
       setState(() {
@@ -76,11 +73,8 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
               value.lock = courseDetails.lock;
             }
           });
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.courses.length);
     });
     ref.onChildRemoved.listen((onData) {
       courseDetails = CourseDetails.fromSnapshot(onData.snapshot);
@@ -90,37 +84,34 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
               (value) => value.courseName == courseDetails.courseName);
           this.items.removeWhere(
               (value) => value.courseName == courseDetails.courseName);
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.courses.length);
     });
   }
 
-  changeLockFirebase(String courseName, bool lock) {
+  changeLockFirebase(String courseName, bool lock) async {
     final ref = fb.reference();
-    print(courseName);
-    ref.child("Courses").child(courseName).child("lock").set(lock);
+
+    await ref.child("Courses").child(courseName).child("lock").set(lock);
   }
 
   delFirebase(String courseName) async {
     final ref = fb.reference();
-    ref.child("Courses").child(courseName).remove();
-    ref.child("Backup").child(courseName).remove();
-    ref.child("CourseAttendance").child(courseName).remove();
-    ref.child("TimeStamp").child(courseName).remove();
+    await ref.child("Courses").child(courseName).remove();
+    await ref.child("Backup").child(courseName).remove();
+    await ref.child("CourseAttendance").child(courseName).remove();
+    await ref.child("TimeStamp").child(courseName).remove();
     List keys = [];
     await ref.child("CourseCoordinators").once().then((data) {
       if (data.value != null) keys.addAll(data.value.keys);
     });
     keys.forEach((f) async {
-      await ref.child("CourseCoordinators").child(f).once().then((data) {
+      await ref.child("CourseCoordinators").child(f).once().then((data) async {
         CourseCoordinatorsDetails coordinatorsDetails =
             CourseCoordinatorsDetails.fromSnapshot(data);
-        print(coordinatorsDetails.courses);
+
         coordinatorsDetails.courses.removeWhere((a, b) => a == courseName);
-        print(coordinatorsDetails.courses);
+
         if (coordinatorsDetails.courses.length == 0) {
           //del user n firebase
           String id = coordinatorsDetails.email.replaceAll('.', ',');
@@ -128,14 +119,14 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
           id = id.replaceAll('#', ',');
           id = id.replaceAll('[', ',');
           id = id.replaceAll(']', ',');
-          ref.child("CourseCoordinators").child(id).remove();
+          await ref.child("CourseCoordinators").child(id).remove();
         } else {
           String id = coordinatorsDetails.email.replaceAll('.', ',');
           id = id.replaceAll('@', ',');
           id = id.replaceAll('#', ',');
           id = id.replaceAll('[', ',');
           id = id.replaceAll(']', ',');
-          ref
+          await ref
               .child("CourseCoordinators")
               .child(id)
               .set(coordinatorsDetails.toJson());
@@ -271,7 +262,7 @@ class DisplayCoursesListState extends State<DisplayCoursesList> {
                                       GroupedButtonsOrientation.HORIZONTAL,
                                   onSelected: (String selected) => setState(() {
                                     year = selected;
-                                    print("Year = " + this.year);
+
                                     filterSearchResults(this.year);
                                   }),
                                   labels: yearTypes,

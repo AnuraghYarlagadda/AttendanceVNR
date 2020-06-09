@@ -50,9 +50,6 @@ class _StatisticsState extends State<Statistics> {
     this.bars = new List<ChartSeries>();
     this.presentAbsentCount["Present"] = 0.0;
     this.presentAbsentCount["Absent"] = 0.0;
-    print(widget.studentStats.toJson());
-    print("\n");
-    print(this.studentStats.toJson());
     getData();
   }
 
@@ -61,7 +58,6 @@ class _StatisticsState extends State<Statistics> {
     await ref.child("Backup").once().then((onValue) {
       if (onValue.value == null) {
       } else {
-        print(onValue.value.keys);
         if (onValue.value.keys.contains(this.studentStats.courseName)) {
           setState(() {
             this.backupAttendance = BackupAttendance.fromJson(
@@ -76,7 +72,7 @@ class _StatisticsState extends State<Statistics> {
                   (a, b) => dateFormat.parse(a).compareTo(dateFormat.parse(b)));
             this.dates = new LinkedHashMap.fromIterable(sortedKeys,
                 key: (k) => k, value: (k) => this.dates[k]);
-            print(this.dates.length);
+
             this.dates.forEach((k, v) {
               TimeAttendance timeAttendance = v;
               var sortedKeys = timeAttendance.times.keys.toList(growable: false)
@@ -147,12 +143,12 @@ class _StatisticsState extends State<Statistics> {
                 this.studentStats.absent++;
               }
             });
-            print(this.studentStats.toJson());
+
             this.presentAbsentCount["Present"] =
                 this.studentStats.present.toDouble();
             this.presentAbsentCount["Absent"] =
                 this.studentStats.absent.toDouble();
-            print("\n\n");
+
             this.status = Status.data.index;
           });
         } else {}
@@ -232,7 +228,9 @@ class _StatisticsState extends State<Statistics> {
                                 style: GoogleFonts.raleway(
                                     textStyle: TextStyle(
                                         fontSize: 17,
-                                        color: this.what == chartTypes[1]?Colors.teal:Colors.deepPurple,
+                                        color: this.what == chartTypes[1]
+                                            ? Colors.teal
+                                            : Colors.deepPurple,
                                         fontWeight: FontWeight.w600))),
                             trailing: Switch(
                               value: this.what == chartTypes[0],

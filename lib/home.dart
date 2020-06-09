@@ -71,11 +71,8 @@ class HomeState extends State<Home> {
       setState(() {
         try {
           this.currentAdmins.add(adminDetails);
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.currentAdmins.length);
     });
     ref.onChildRemoved.listen((onData) {
       adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
@@ -84,11 +81,8 @@ class HomeState extends State<Home> {
           this
               .currentAdmins
               .removeWhere((value) => value.email == adminDetails.email);
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.currentAdmins.length);
     });
     ref.onChildChanged.listen((onData) {
       adminDetails = AdminDetails.fromSnapshot(onData.snapshot);
@@ -99,11 +93,8 @@ class HomeState extends State<Home> {
               value.permission = adminDetails.permission;
             }
           });
-        } catch (identifier) {
-          print(identifier);
-        }
+        } catch (identifier) {}
       });
-      print(this.currentAdmins.length);
     });
   }
 
