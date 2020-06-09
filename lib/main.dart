@@ -1,19 +1,19 @@
-import 'package:attendance/addCourse.dart';
+import 'package:attendance/Attendance/postAttendance.dart';
+import 'package:attendance/Attendance/showAttendance.dart';
+import 'package:attendance/Attendance/showYearAttendance.dart';
+import 'package:attendance/Course/addCourse.dart';
+import 'package:attendance/Course/listOfCourses.dart';
+import 'package:attendance/Course/viewAndEditCourse.dart';
+import 'package:attendance/DashBoard/coursesBackupList.dart';
+import 'package:attendance/DashBoard/displayDates.dart';
+import 'package:attendance/DashBoard/statistics.dart';
+import 'package:attendance/DashBoard/studentReport.dart';
+import 'package:attendance/ManageUsers/manageAdmins.dart';
+import 'package:attendance/ManageUsers/manageCourseCoordinators.dart';
 import 'package:attendance/contacts.dart';
-import 'package:attendance/coursesBackupList.dart';
-import 'package:attendance/displayDates.dart';
 import 'package:attendance/home.dart';
-import 'package:attendance/manageAdmins.dart';
-import 'package:attendance/manageCourseCoordinators.dart';
-import 'package:attendance/postAttendance.dart';
-import 'package:attendance/showAttendance.dart';
-import 'package:attendance/showYearAttendance.dart';
-import 'package:attendance/statistics.dart';
-import 'package:attendance/studentReport.dart';
-import 'package:attendance/viewAndEditCourse.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:attendance/listOfCourses.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

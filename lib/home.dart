@@ -1,9 +1,9 @@
+import 'package:attendance/DashBoard/dashboard.dart';
 import 'package:attendance/Utils/Settings.dart';
 import 'package:attendance/Utils/StoragePermissions.dart';
 import 'package:attendance/Utils/login.dart';
 import 'package:attendance/Utils/restrictUser.dart';
 import 'package:attendance/Utils/signin.dart';
-import 'package:attendance/dashboard.dart';
 import 'package:attendance/team.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
