@@ -296,25 +296,31 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
                                               }
                                             }),
                                     (this.editTrainerDetails == false)
-                                        ? IconButton(
-                                            icon: Icon(Icons.phone),
-                                            color: Colors.green,
-                                            onPressed: () {
-                                              if (this
-                                                      .courseDetails
-                                                      .phone
-                                                      .length ==
-                                                  1) {
-                                                _launched = _makePhoneCall(
-                                                    'tel:' +
+                                        ? this.courseDetails.phone != null
+                                            ? IconButton(
+                                                icon: Icon(Icons.phone),
+                                                color: Colors.green,
+                                                onPressed: () {
+                                                  if (this
+                                                          .courseDetails
+                                                          .phone
+                                                          .length ==
+                                                      1) {
+                                                    _launched = _makePhoneCall(
+                                                        'tel:' +
+                                                            this
+                                                                .courseDetails
+                                                                .phone[0]);
+                                                  } else {
+                                                    showContacts(
+                                                        context,
                                                         this
                                                             .courseDetails
-                                                            .phone[0]);
-                                              } else {
-                                                showContacts(context,
-                                                    this.courseDetails.phone);
-                                              }
-                                            })
+                                                            .phone);
+                                                  }
+                                                })
+                                            : Padding(
+                                                padding: EdgeInsets.all(0))
                                         : IconButton(
                                             icon: Icon(
                                               Icons.contacts,
@@ -675,15 +681,20 @@ class ViewAndEditCourseState extends State<ViewAndEditCourse> {
         if (file != null) {
           var bytes = file.readAsBytesSync();
           var decoder = SpreadsheetDecoder.decodeBytes(bytes);
-          decoder.tables.keys.forEach((f) {
-            f = f.toString().toLowerCase();
-          });
-
-          if (decoder.tables.keys.contains(this.courseName.toLowerCase())) {
-            var table = decoder.tables[this.courseName.toLowerCase()];
+          bool isPresent = false;
+          String subSheetName;
+          for (var subSheet in decoder.tables.keys) {
+            if (subSheet.trim().toLowerCase() ==
+                this.courseName.toLowerCase()) {
+              subSheetName = subSheet;
+              isPresent = true;
+            }
+          }
+          if (isPresent) {
+            var table = decoder.tables[subSheetName];
             var j;
             for (var i = 0; i < table.maxRows; i++) {
-              if ((table.rows[i].toString().toLowerCase())
+              if ((table.rows[i].toString().trim().toLowerCase())
                   .contains("Name of the Student".toLowerCase())) {
                 j = i + 1;
               }

@@ -77,7 +77,9 @@ class ManageAdminState extends State<ManageAdmin> {
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
-      "bharathkumarchowdary@gmail.com"
+      "bharathkumarchowdary@gmail.com",
+      "sweetybandi@gmail.com",
+      "laxmivallabhaneni92@gmail.com"
     };
     getData();
   }
@@ -253,31 +255,36 @@ class ManageAdminState extends State<ManageAdmin> {
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          IconButton(
-                                              icon: Icon(Icons.phone),
-                                              color: Colors.blue,
-                                              onPressed: () {
-                                                if (this
-                                                        .admins
-                                                        .elementAt(index)
-                                                        .phone
-                                                        .length ==
-                                                    1) {
-                                                  _launched = _makePhoneCall(
-                                                      'tel:' +
+                                          this.admins.elementAt(index).phone !=
+                                                  null
+                                              ? IconButton(
+                                                  icon: Icon(Icons.phone),
+                                                  color: Colors.blue,
+                                                  onPressed: () {
+                                                    if (this
+                                                            .admins
+                                                            .elementAt(index)
+                                                            .phone
+                                                            .length ==
+                                                        1) {
+                                                      _launched = _makePhoneCall(
+                                                          'tel:' +
+                                                              this
+                                                                  .admins
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .phone[0]);
+                                                    } else {
+                                                      showContacts(
+                                                          context,
                                                           this
                                                               .admins
                                                               .elementAt(index)
-                                                              .phone[0]);
-                                                } else {
-                                                  showContacts(
-                                                      context,
-                                                      this
-                                                          .admins
-                                                          .elementAt(index)
-                                                          .phone);
-                                                }
-                                              }),
+                                                              .phone);
+                                                    }
+                                                  })
+                                              : Padding(
+                                                  padding: EdgeInsets.all(0)),
                                           !this.defaultAdmins.contains(this
                                                   .admins
                                                   .elementAt(index)
@@ -432,40 +439,31 @@ class ManageAdminState extends State<ManageAdmin> {
                                           backgroundColor: Colors.red,
                                           textColor: Colors.white);
                                     } else {
-                                      if (this.phones.length != 0) {
-                                        AdminDetails adminDetails;
-                                        if (this.defaultAdmins.contains(
-                                            emailController.text.trim())) {
-                                          adminDetails = new AdminDetails(
-                                              emailController.text.trim(),
-                                              true,
-                                              this.phones.toList());
-                                        } else {
-                                          adminDetails = new AdminDetails(
-                                              emailController.text.trim(),
-                                              false,
-                                              this.phones.toList());
-                                        }
-                                        postFirebase(adminDetails);
-                                        Fluttertoast.showToast(
-                                            msg: "User Added " +
-                                                adminDetails.email,
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            backgroundColor: Colors.green,
-                                            textColor: Colors.white);
-                                        emailController.clear();
-                                        setState(() {
-                                          this.contactWidget.clear();
-                                          this.phones.clear();
-                                        });
+                                      AdminDetails adminDetails;
+                                      if (this.defaultAdmins.contains(
+                                          emailController.text.trim())) {
+                                        adminDetails = new AdminDetails(
+                                            emailController.text.trim(),
+                                            true,
+                                            this.phones.toList());
                                       } else {
-                                        Fluttertoast.showToast(
-                                            msg:
-                                                "Contact Details can't be Empty",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            backgroundColor: Colors.deepOrange,
-                                            textColor: Colors.white);
+                                        adminDetails = new AdminDetails(
+                                            emailController.text.trim(),
+                                            false,
+                                            this.phones.toList());
                                       }
+                                      postFirebase(adminDetails);
+                                      Fluttertoast.showToast(
+                                          msg: "User Added " +
+                                              adminDetails.email,
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white);
+                                      emailController.clear();
+                                      setState(() {
+                                        this.contactWidget.clear();
+                                        this.phones.clear();
+                                      });
                                     }
                                   });
                                 } else {

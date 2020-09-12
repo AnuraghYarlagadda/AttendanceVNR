@@ -87,7 +87,9 @@ class ManageCordinatorsState extends State<ManageCordinators> {
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
-      "bharathkumarchowdary@gmail.com"
+      "bharathkumarchowdary@gmail.com",
+      "sweetybandi@gmail.com",
+      "laxmivallabhaneni92@gmail.com"
     };
     getData();
   }
@@ -365,31 +367,39 @@ class ManageCordinatorsState extends State<ManageCordinators> {
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          IconButton(
-                                              icon: Icon(Icons.phone),
-                                              color: Colors.blue,
-                                              onPressed: () {
-                                                if (this
-                                                        .coordinators
-                                                        .elementAt(index)
-                                                        .phone
-                                                        .length ==
-                                                    1) {
-                                                  _launched = _makePhoneCall(
-                                                      'tel:' +
+                                          this
+                                                      .coordinators
+                                                      .elementAt(index)
+                                                      .phone !=
+                                                  null
+                                              ? IconButton(
+                                                  icon: Icon(Icons.phone),
+                                                  color: Colors.blue,
+                                                  onPressed: () {
+                                                    if (this
+                                                            .coordinators
+                                                            .elementAt(index)
+                                                            .phone
+                                                            .length ==
+                                                        1) {
+                                                      _launched = _makePhoneCall(
+                                                          'tel:' +
+                                                              this
+                                                                  .coordinators
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .phone[0]);
+                                                    } else {
+                                                      showContacts(
+                                                          context,
                                                           this
                                                               .coordinators
                                                               .elementAt(index)
-                                                              .phone[0]);
-                                                } else {
-                                                  showContacts(
-                                                      context,
-                                                      this
-                                                          .coordinators
-                                                          .elementAt(index)
-                                                          .phone);
-                                                }
-                                              }),
+                                                              .phone);
+                                                    }
+                                                  })
+                                              : Padding(
+                                                  padding: EdgeInsets.all(0)),
                                           !this.defaultAdmins.contains(this
                                                   .coordinators
                                                   .elementAt(index)
@@ -544,46 +554,37 @@ class ManageCordinatorsState extends State<ManageCordinators> {
                                           backgroundColor: Colors.red,
                                           textColor: Colors.white);
                                     } else {
-                                      if (this.phones.length != 0) {
-                                        CourseCoordinatorsDetails
-                                            coordinatorsDetails;
-                                        if (this.defaultAdmins.contains(
-                                            emailController.text.trim())) {
-                                          this.courses[this.courseName] = true;
-                                          coordinatorsDetails =
-                                              new CourseCoordinatorsDetails(
-                                                  emailController.text.trim(),
-                                                  this.phones.toList(),
-                                                  this.courses);
-                                        } else {
-                                          this.courses[this.courseName] = false;
-                                          coordinatorsDetails =
-                                              new CourseCoordinatorsDetails(
-                                                  emailController.text.trim(),
-                                                  this.phones.toList(),
-                                                  this.courses);
-                                        }
-
-                                        postFirebase(coordinatorsDetails);
-                                        Fluttertoast.showToast(
-                                            msg: "User Added " +
-                                                coordinatorsDetails.email,
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            backgroundColor: Colors.green,
-                                            textColor: Colors.white);
-                                        emailController.clear();
-                                        setState(() {
-                                          this.contactWidget.clear();
-                                          this.phones.clear();
-                                        });
+                                      CourseCoordinatorsDetails
+                                          coordinatorsDetails;
+                                      if (this.defaultAdmins.contains(
+                                          emailController.text.trim())) {
+                                        this.courses[this.courseName] = true;
+                                        coordinatorsDetails =
+                                            new CourseCoordinatorsDetails(
+                                                emailController.text.trim(),
+                                                this.phones.toList(),
+                                                this.courses);
                                       } else {
-                                        Fluttertoast.showToast(
-                                            msg:
-                                                "Contact Details can't be Empty",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            backgroundColor: Colors.deepOrange,
-                                            textColor: Colors.white);
+                                        this.courses[this.courseName] = false;
+                                        coordinatorsDetails =
+                                            new CourseCoordinatorsDetails(
+                                                emailController.text.trim(),
+                                                this.phones.toList(),
+                                                this.courses);
                                       }
+
+                                      postFirebase(coordinatorsDetails);
+                                      Fluttertoast.showToast(
+                                          msg: "User Added " +
+                                              coordinatorsDetails.email,
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white);
+                                      emailController.clear();
+                                      setState(() {
+                                        this.contactWidget.clear();
+                                        this.phones.clear();
+                                      });
                                     }
                                   });
                                 } else {

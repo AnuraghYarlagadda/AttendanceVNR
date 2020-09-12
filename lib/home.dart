@@ -46,7 +46,9 @@ class HomeState extends State<Home> {
     this.defaultAdmins = <dynamic>{
       "anuraghyarlagadda@gmail.com",
       "ramakrishna_p@vnrvjiet.in",
-      "bharathkumarchowdary@gmail.com"
+      "bharathkumarchowdary@gmail.com",
+      "sweetybandi@gmail.com",
+      "laxmivallabhaneni92@gmail.com"
     };
     checkUserStatus();
     getCurrentAdmins();

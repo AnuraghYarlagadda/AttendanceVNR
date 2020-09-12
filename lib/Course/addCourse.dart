@@ -360,13 +360,6 @@ class AddCourseState extends State<AddCourse> {
                                   backgroundColor: Colors.deepOrange,
                                   textColor: Colors.white);
                             }
-                            if (this.phone == null || this.phone.length == 0) {
-                              Fluttertoast.showToast(
-                                  msg: "Pick Trainer Contact!",
-                                  toastLength: Toast.LENGTH_LONG,
-                                  backgroundColor: Colors.deepOrange,
-                                  textColor: Colors.white);
-                            }
                             if (this.year == null || this.year.length == 0) {
                               Fluttertoast.showToast(
                                   msg: "Year has to be selected!",
@@ -377,8 +370,7 @@ class AddCourseState extends State<AddCourse> {
                             if (courseName.length != 0 &&
                                 trainerName.length != 0 &&
                                 venue.length != 0 &&
-                                this.year.length != 0 &&
-                                this.phone.length != 0) {
+                                this.year.length != 0) {
                               CourseDetails courseDetails = new CourseDetails(
                                   courseName,
                                   trainerName,
